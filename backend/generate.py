@@ -61,7 +61,7 @@ def generate_views(models):
 
         # GET
         lines.append("@api_view(['GET'])")
-        lines.append(f"def Ver{model}s(request):")
+        lines.append(f"def Leer{model}(request):")
         lines.append(f"    result = {model}.objects.all()")
         lines.append(f"    serializer = {serializer}(result, many=True)")
         lines.append("    return Response(serializer.data)")
@@ -80,7 +80,7 @@ def generate_views(models):
 
         # PUT
         lines.append("@api_view(['PUT'])")
-        lines.append(f"def Modificar{model}(request, pk=None):")
+        lines.append(f"def Cambiar{model}(request, pk=None):")
         lines.append(f"    try:")
         lines.append(f"        instance = {model}.objects.get(pk=pk)")
         lines.append("    except Exception as e:")
@@ -106,9 +106,9 @@ def generate_urls(models):
         "    path('admin/', admin.site.urls),",
     ]
     for model, _ in models:
-        lines.append(f"    path('ver{model.lower()}s/', views.Ver{model}s),")
+        lines.append(f"    path('leer{model.lower()}s/', views.Leer{model}),")
         lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
-        lines.append(f"    path('modificar{model.lower()}/<int:pk>/', views.Modificar{model}),")
+        lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
     lines.append("]")
     return "\n".join(lines)
 

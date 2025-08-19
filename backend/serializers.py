@@ -6,6 +6,16 @@ class UbicacionSerializado(serializers.ModelSerializer):
         model = Ubicacion
         fields = ('REGIONES', 'CAPITALES', 'ID', 'Region', 'Capital', 'Calle', 'Numero')
 
+class BeneficiarioSerializado(serializers.ModelSerializer):
+    class Meta:
+        model = Beneficiario
+        fields = ('PERSONA', 'EMPRESA', 'PERFIL', 'ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+
+class ProyectoSerializado(serializers.ModelSerializer):
+    class Meta:
+        model = Proyecto
+        fields = ('ID', 'Beneficiario', 'Titulo', 'Descripcion', 'DuracionEnMesesMinimo', 'DuracionEnMesesMaximo', 'Alcance', 'Area')
+
 class PersonaSerializado(serializers.ModelSerializer):
     class Meta:
         model = Persona
@@ -26,20 +36,10 @@ class UsuarioDeMatchaFundingSerializado(serializers.ModelSerializer):
         model = UsuarioDeMatchaFunding
         fields = ('ID', 'Persona', 'NombreDeUsuario', 'Contrasena', 'Correo')
 
-class BeneficiarioSerializado(serializers.ModelSerializer):
-    class Meta:
-        model = Beneficiario
-        fields = ('PERSONA', 'EMPRESA', 'PERFIL', 'ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
-
 class ConsorcioDeBeneficiariosSerializado(serializers.ModelSerializer):
     class Meta:
         model = ConsorcioDeBeneficiarios
         fields = ('ID', 'PrimerBeneficiario', 'SegundoBeneficiario')
-
-class ProyectoSerializado(serializers.ModelSerializer):
-    class Meta:
-        model = Proyecto
-        fields = ('ID', 'Beneficiario', 'Titulo', 'Descripcion', 'DuracionEnMesesMinimo', 'DuracionEnMesesMaximo', 'Alcance', 'Area')
 
 class FinanciadorSerializado(serializers.ModelSerializer):
     class Meta:
