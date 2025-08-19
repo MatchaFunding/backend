@@ -5,80 +5,46 @@ Clase compartida para representar la ubicaion de un objeto.
 '''
 class Ubicacion(models.Model):
 	REGIONES = {
-		"AP", "Región de Aysén del General Carlos Ibáñez del Campo",
-		"TA", "Región de Magallanes y de la Antártica Chilena",
-		"AN", "Región de Arica y Parinacota",
-		"AT", "Región de Atacama",
-		"CO", "Región de Tarapacá",
-		"VA", "Región de Los Ríos",
-		"RM", "Región de Ñuble",
-		"LI", "Región de Antofagasta",
-		"ML", "Región de Coquimbo",
-		"NB", "Región de Los Lagos",
-		"BI", "Región del Libertador General Bernardo O'Higgins",
-		"AR", "Región de La Araucanía",
-		"LR", "Región del Maule",
-		"LL", "Región del Biobío",
-		"AI", "Región de Valparaíso",
-		"MA", "Región Metropolitana de Santiago"
+		"AP": "Región de Aysén del General Carlos Ibáñez del Campo",
+		"TA": "Región de Magallanes y de la Antártica Chilena",
+		"AN": "Región de Arica y Parinacota",
+		"AT": "Región de Atacama",
+		"CO": "Región de Tarapacá",
+		"VA": "Región de Los Ríos",
+		"RM": "Región de Ñuble",
+		"LI": "Región de Antofagasta",
+		"ML": "Región de Coquimbo",
+		"NB": "Región de Los Lagos",
+		"BI": "Región del Libertador General Bernardo O'Higgins",
+		"AR": "Región de La Araucanía",
+		"LR": "Región del Maule",
+		"LL": "Región del Biobío",
+		"AI": "Región de Valparaíso",
+		"MA": "Región Metropolitana de Santiago"
 	}
 	CAPITALES = {
-		"AP", "Arica y Parinacota",
-		"TA", "Iquique",
-		"AN", "Antofagasta ",
-		"AT", "Copiapó",
-		"CO", "La Serena",
-		"VA", "Valparaíso",
-		"RM", "Santiago",
-		"LI", "Rancagua",
-		"ML", "Talca",
-		"NB", "Chillán",
-		"BI", "Concepción",
-		"AR", "Temuco",
-		"LR", "Valdivia",
-		"LL", "Puerto Montt",
-		"AI", "Coyhaique",
-		"MA", "Punta Arena"
+		"AP": "Arica y Parinacota",
+		"TA": "Iquique",
+		"AN": "Antofagasta ",
+		"AT": "Copiapó",
+		"CO": "La Serena",
+		"VA": "Valparaíso",
+		"RM": "Santiago",
+		"LI": "Rancagua",
+		"ML": "Talca",
+		"NB": "Chillán",
+		"BI": "Concepción",
+		"AR": "Temuco",
+		"LR": "Valdivia",
+		"LL": "Puerto Montt",
+		"AI": "Coyhaique",
+		"MA": "Punta Arena"
 	}
 	ID = models.BigAutoField(primary_key=True)
-	Region = models.CharField(choices=REGIONES)
-	Capital = models.CharField(choices=CAPITALES)
+	Region = models.CharField(max_length=30, choices=REGIONES)
+	Capital = models.CharField(max_length=30, choices=CAPITALES)
 	Calle = models.CharField(max_length=300)
 	Numero = models.IntegerField()
-
-'''
-Clase que representa a una persona natural, la cual puede ser miembro de una empresa o proyecto.
-Abajo de este estan las asociaciones entre persona y agrupacion.
-https://www.nombrerutyfirma.com/nombre
-https://www.nombrerutyfirma.com/rut
-'''
-class Persona(models.Model):
-	SEXO = {
-		"VAR": "Hombre",
-		"MUJ": "Mujer",
-		"NA": "Otro"
-	}
-	ID = models.BigAutoField(primary_key=True)
-	Nombre = models.CharField(max_length=200)
-	Sexo = models.CharField(choices=SEXO)
-	RUT = models.CharField(max_length=12)
-
-class MiembroDeUnaEmpresa(models.Model):
-	ID = models.BigAutoField(primary_key=True)
-	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
-	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
-
-class MiembroDeProyecto(models.Model):
-	ID = models.BigAutoField(primary_key=True)
-	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
-	Proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
-
-class UsuarioDeMatchaFunding(models.Model):
-	ID = models.BigAutoField(primary_key=True)
-	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
-	NombreDeUsuario = models.CharField(max_length=200, null=False)
-	Contrasena = models.CharField(max_length=200, null=False)
-	Correo = models.CharField(max_length=200, null=False)
 
 '''
 Clase que representa la empresa, emprendimiento, grupo de investigacion, etc.
@@ -114,20 +80,11 @@ class Beneficiario(models.Model):
 	Nombre = models.CharField(max_length=100)
 	FechaDeCreacion = models.DateField()
 	LugarDeCreacion = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
-	TipoDePersona = models.CharField(choices=PERSONA)
-	TipoDeEmpresa = models.CharField(choices=EMPRESA)
-	Perfil = models.CharField(choices=PERFIL)
+	TipoDePersona = models.CharField(max_length=30, choices=PERSONA)
+	TipoDeEmpresa = models.CharField(max_length=30, choices=EMPRESA)
+	Perfil = models.CharField(max_length=30, choices=PERFIL)
 	RUTdeEmpresa = models.CharField(max_length=12)
 	RUTdeRepresentante = models.CharField(max_length=12)
-
-'''
-Agrupacion de multiples empresas y agrupaciones que pretenden postular
-en conjunto a un instrumento / fondo comun.
-'''
-class ConsorcioDeBeneficiarios(models.Model):
-	ID = models.BigAutoField(primary_key=True)
-	PrimerBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
-	SegundoBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
 
 '''
 Clase que representa los proyectos de una misma empresa.
@@ -141,6 +98,49 @@ class Proyecto(models.Model):
 	DuracionEnMesesMaximo = models.IntegerField()
 	Alcance = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
 	Area = models.CharField(max_length=100)
+
+'''
+Clase que representa a una persona natural, la cual puede ser miembro de una empresa o proyecto.
+Abajo de este estan las asociaciones entre persona y agrupacion.
+https://www.nombrerutyfirma.com/nombre
+https://www.nombrerutyfirma.com/rut
+'''
+class Persona(models.Model):
+	SEXO = {
+		"VAR": "Hombre",
+		"MUJ": "Mujer",
+		"NA": "Otro"
+	}
+	ID = models.BigAutoField(primary_key=True)
+	Nombre = models.CharField(max_length=200)
+	Sexo = models.CharField(max_length=30, choices=SEXO)
+	RUT = models.CharField(max_length=12)
+
+class MiembroDeUnaEmpresa(models.Model):
+	ID = models.BigAutoField(primary_key=True)
+	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
+
+class MiembroDeProyecto(models.Model):
+	ID = models.BigAutoField(primary_key=True)
+	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+	Proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+
+class UsuarioDeMatchaFunding(models.Model):
+	ID = models.BigAutoField(primary_key=True)
+	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+	NombreDeUsuario = models.CharField(max_length=200, null=False)
+	Contrasena = models.CharField(max_length=200, null=False)
+	Correo = models.CharField(max_length=200, null=False)
+
+'''
+Agrupacion de multiples empresas y agrupaciones que pretenden postular
+en conjunto a un instrumento / fondo comun.
+'''
+class ConsorcioDeBeneficiarios(models.Model):
+	ID = models.BigAutoField(primary_key=True)
+	PrimerBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='primero')
+	SegundoBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='segundo')
 
 '''
 Clase que representa las entes financieras que ofrecen los fondos
@@ -203,9 +203,9 @@ class Instrumento(models.Model):
 	Requisitos = models.CharField(max_length=1000)
 	MontoMinimo = models.IntegerField()
 	MontoMaximo = models.IntegerField()
-	Estado = models.IntegerField(choices=ESTADO)
-	TipoDeBeneficio = models.IntegerField(choices=BENEFICIO)
-	TipoDePerfil = models.IntegerField(choices=PERSONA)
+	Estado = models.CharField(max_length=30, choices=ESTADO)
+	TipoDeBeneficio = models.CharField(max_length=30, choices=BENEFICIO)
+	TipoDePerfil = models.CharField(max_length=30, choices=PERSONA)
 	EnlaceDelDetalle = models.CharField(max_length=300)
 	EnlaceDeLaFoto = models.CharField(max_length=300)
 
@@ -222,7 +222,7 @@ class Postulacion(models.Model):
 	Beneficiario = models.ForeignKey(Beneficiario, null=False, on_delete=models.CASCADE)
 	Proyecto = models.ForeignKey(Proyecto, null=False, on_delete=models.CASCADE)
 	Instrumento = models.ForeignKey(Instrumento, on_delete=models.CASCADE)
-	Resultado = models.CharField(choices=RESULTADO)
+	Resultado = models.CharField(max_length=30, choices=RESULTADO)
 	MontoObtenido = models.IntegerField()
 	FechaDePostulacion = models.DateField()
 	FechaDeResultado = models.DateField()
