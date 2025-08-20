@@ -52,6 +52,7 @@ que desea postular al fondo. La informacion debe regirse por la descripcion
 legal de la empresa.
 https://www.registrodeempresasysociedades.cl/MarcaDominio.aspx
 https://www.rutificador.co/empresas/buscar
+https://www.boletaofactura.com/
 https://registros19862.gob.cl/
 https://dequienes.cl/
 '''
@@ -89,6 +90,7 @@ class Beneficiario(models.Model):
 
 '''
 Clase que representa los proyectos de una misma empresa.
+https://www.boletaofactura.com/
 '''
 class Proyecto(models.Model):
 	ID = models.BigAutoField(primary_key=True)
@@ -105,6 +107,7 @@ Clase que representa a una persona natural, la cual puede ser miembro de una emp
 Abajo de este estan las asociaciones entre persona y agrupacion.
 https://www.nombrerutyfirma.com/nombre
 https://www.nombrerutyfirma.com/rut
+https://www.volanteomaleta.com/
 '''
 class Persona(models.Model):
 	SEXO = {
