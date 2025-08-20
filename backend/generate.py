@@ -1,11 +1,13 @@
 import ast
 import os
 
-SERIALIZERS_FILE = "serializers.py"
+SERIAL_FILE = "serializers.py"
 MODELS_FILE = "models.py"
 VIEWS_FILE = "views.py"
 URLS_FILE = "urls.py"
 ADMIN_FILE = "admin.py"
+FORMS_FILE = "forms.py"
+FORMS_DIR = "forms"
 
 VOCALES = {
     'a', 'e', 'i', 'o', 'u',
@@ -13,20 +15,26 @@ VOCALES = {
 }
 
 def parse_models(file_path):
-    """Parsea models.py y devuelve una lista de clases modelo con sus campos"""
+    """Parsea models.py y devuelve una lista de clases modelo con sus campos, 
+    omitiendo diccionarios definidos dentro de la clase"""
     with open(file_path, "r", encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=file_path)
 
     models = []
     for node in tree.body:
-        if isinstance(node, ast.ClassDef):
+        if isinstance(node, ast.ClassDef):  # es una clase
             for base in node.bases:
-                if isinstance(base, ast.Attribute) and base.attr == "Model":
+                if isinstance(base, ast.Attribute) and base.attr == "Model":  # hereda de models.Model
                     fields = []
                     for stmt in node.body:
-                        if isinstance(stmt, ast.Assign):
-                            if isinstance(stmt.targets[0], ast.Name):
-                                fields.append(stmt.targets[0].id)
+                        if isinstance(stmt, ast.Assign):  
+                            target = stmt.targets[0]
+                            # Si el valor de la asignación es un diccionario, ignorar
+                            if isinstance(stmt.value, ast.Dict):
+                                continue
+                            # Si es un campo válido (ej: models.CharField)
+                            if isinstance(target, ast.Name):
+                                fields.append(target.id)
                     models.append((node.name, fields))
     return models
 
@@ -154,14 +162,55 @@ def generate_admin(models):
     return "\n".join(lines)
 
 
+def generate_forms(models):
+    forms_code = [
+        "from django.http import HttpResponseRedirect",
+        "from django.shortcuts import render",
+        "from django import forms",
+        "from .models import *",
+        "",
+    ]
+    for model, fields in models.items():
+        class_name = f"{model}Form"
+        forms_code.append(f"class {class_name}(forms.Form):")
+        for field, ftype in fields:
+            if ftype in ["CharField", "TextField"]:
+                forms_code.append(f"    {field} = forms.CharField(label='{field}', max_length=255)")
+            elif ftype in ["IntegerField", "BigAutoField"]:
+                forms_code.append(f"    {field} = forms.IntegerField(label='{field}')")
+            else:
+                forms_code.append(f"    {field} = forms.CharField(label='{field}')")
+        
+        forms_code.append("")
+        func_name = f"get_{model.lower()}"
+        forms_code.append(f"def {func_name}(request):")
+        forms_code.append(f"    if request.method == 'POST':")
+        forms_code.append(f"        form = {class_name}(request.POST)")
+        forms_code.append(f"        if form.is_valid():")
+        forms_code.append(f"            # Guardar en la BD con el modelo real")
+        forms_code.append(f"            obj = {model}(**form.cleaned_data)")
+        forms_code.append(f"            obj.save()")
+        forms_code.append(f"            return HttpResponseRedirect('/thanks/')")
+        forms_code.append("    else:")
+        forms_code.append(f"        form = {class_name}()")
+        forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
+        forms_code.append("")
+        html_code = """<form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Submit">
+        </form>"""
+        with open(os.path.join(FORMS_DIR, f"{model.lower()}.html"), "w", encoding="utf-8") as f:
+            f.write(html_code)
+
+    with open(FORMS_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(forms_code))
+
+
 def main():
     models = parse_models(MODELS_FILE)
-    os.remove(f"./{SERIALIZERS_FILE}")
-    os.remove(f"./{VIEWS_FILE}")
-    os.remove(f"./{URLS_FILE}")
-    os.remove(f"./{ADMIN_FILE}")
 
-    with open(SERIALIZERS_FILE, "w", encoding="utf-8") as f:
+    with open(SERIAL_FILE, "w", encoding="utf-8") as f:
         f.write(generate_serializers(models))
 
     with open(VIEWS_FILE, "w", encoding="utf-8") as f:
@@ -173,7 +222,9 @@ def main():
     with open(ADMIN_FILE, "w", encoding="utf-8") as f:
         f.write(generate_admin(models))
 
-    print("Archivos serializers.py, views.py, urls.py y admin.py generados correctamente.")
+    #generate_forms(models)
+
+    print("Archivos generados correctamente!")
 
 
 if __name__ == "__main__":

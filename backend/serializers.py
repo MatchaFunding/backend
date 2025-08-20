@@ -4,12 +4,12 @@ from .models import *
 class UbicacionSerializado(serializers.ModelSerializer):
     class Meta:
         model = Ubicacion
-        fields = ('REGIONES', 'CAPITALES', 'ID', 'Region', 'Capital', 'Calle', 'Numero')
+        fields = ('ID', 'Region', 'Capital', 'Calle', 'Numero')
 
 class BeneficiarioSerializado(serializers.ModelSerializer):
     class Meta:
         model = Beneficiario
-        fields = ('PERSONA', 'EMPRESA', 'PERFIL', 'ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 class ProyectoSerializado(serializers.ModelSerializer):
     class Meta:
@@ -19,7 +19,7 @@ class ProyectoSerializado(serializers.ModelSerializer):
 class PersonaSerializado(serializers.ModelSerializer):
     class Meta:
         model = Persona
-        fields = ('SEXO', 'ID', 'Nombre', 'Sexo', 'RUT')
+        fields = ('ID', 'Nombre', 'Sexo', 'RUT')
 
 class MiembroSerializado(serializers.ModelSerializer):
     class Meta:
@@ -44,14 +44,14 @@ class ConsorcioSerializado(serializers.ModelSerializer):
 class FinanciadorSerializado(serializers.ModelSerializer):
     class Meta:
         model = Financiador
-        fields = ('ID', 'Institucion', 'Tipo')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 class InstrumentoSerializado(serializers.ModelSerializer):
     class Meta:
         model = Instrumento
-        fields = ('ESTADO', 'BENEFICIO', 'PERSONA', 'ID', 'Titulo', 'Financiador', 'Alcance', 'Descripcion', 'FechaDeApertura', 'FechaDeCierre', 'DuracionEnMeses', 'Beneficios', 'Requisitos', 'MontoMinimo', 'MontoMaximo', 'Estado', 'TipoDeBeneficio', 'TipoDePerfil', 'EnlaceDelDetalle', 'EnlaceDeLaFoto')
+        fields = ('ID', 'Titulo', 'Financiador', 'Alcance', 'Descripcion', 'FechaDeApertura', 'FechaDeCierre', 'DuracionEnMeses', 'Beneficios', 'Requisitos', 'MontoMinimo', 'MontoMaximo', 'Estado', 'TipoDeBeneficio', 'TipoDePerfil', 'EnlaceDelDetalle', 'EnlaceDeLaFoto')
 
 class PostulacionSerializado(serializers.ModelSerializer):
     class Meta:
         model = Postulacion
-        fields = ('RESULTADO', 'ID', 'Beneficiario', 'Proyecto', 'Instrumento', 'Resultado', 'MontoObtenido', 'FechaDePostulacion', 'FechaDeResultado', 'Detalle')
+        fields = ('ID', 'Beneficiario', 'Proyecto', 'Instrumento', 'Resultado', 'MontoObtenido', 'FechaDePostulacion', 'FechaDeResultado', 'Detalle')
