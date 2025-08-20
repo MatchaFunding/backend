@@ -15,7 +15,6 @@ def VerFormularioUbicacion(request):
         if form.is_valid():
             obj = Ubicacion(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = UbicacionForm()
         context['region'] = 'Region'
@@ -36,7 +35,6 @@ def VerFormularioBeneficiario(request):
         if form.is_valid():
             obj = Beneficiario(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = BeneficiarioForm()
         context['nombre'] = 'Nombre'
@@ -61,7 +59,6 @@ def VerFormularioProyecto(request):
         if form.is_valid():
             obj = Proyecto(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = ProyectoForm()
         context['beneficiario'] = 'Beneficiario'
@@ -85,7 +82,6 @@ def VerFormularioPersona(request):
         if form.is_valid():
             obj = Persona(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = PersonaForm()
         context['nombre'] = 'Nombre'
@@ -105,7 +101,6 @@ def VerFormularioMiembro(request):
         if form.is_valid():
             obj = Miembro(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = MiembroForm()
         context['persona'] = 'Persona'
@@ -124,7 +119,6 @@ def VerFormularioColaborador(request):
         if form.is_valid():
             obj = Colaborador(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = ColaboradorForm()
         context['persona'] = 'Persona'
@@ -143,7 +137,6 @@ def VerFormularioUsuario(request):
         if form.is_valid():
             obj = Usuario(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = UsuarioForm()
         context['persona'] = 'Persona'
@@ -164,7 +157,6 @@ def VerFormularioConsorcio(request):
         if form.is_valid():
             obj = Consorcio(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = ConsorcioForm()
         context['primerbeneficiario'] = 'PrimerBeneficiario'
@@ -183,7 +175,6 @@ def VerFormularioFinanciador(request):
         if form.is_valid():
             obj = Financiador(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = FinanciadorForm()
         context['nombre'] = 'Nombre'
@@ -208,7 +199,6 @@ def VerFormularioInstrumento(request):
         if form.is_valid():
             obj = Instrumento(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = InstrumentoForm()
         context['titulo'] = 'Titulo'
@@ -241,7 +231,6 @@ def VerFormularioPostulacion(request):
         if form.is_valid():
             obj = Postulacion(**form.cleaned_data)
             obj.save()
-            return HttpResponseRedirect('/thanks/')
     if request.method == 'GET':
         form = PostulacionForm()
         context['beneficiario'] = 'Beneficiario'

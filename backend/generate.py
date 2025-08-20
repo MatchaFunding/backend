@@ -221,7 +221,6 @@ def generate_forms(models):
         forms_code.append(f"        if form.is_valid():")
         forms_code.append(f"            obj = {model}(**form.cleaned_data)")
         forms_code.append(f"            obj.save()")
-        forms_code.append(f"            return HttpResponseRedirect('/thanks/')")
         forms_code.append(f"    if request.method == 'GET':")
         forms_code.append(f"        form = {model}Form()")
         for field in formfields:
