@@ -1,5 +1,6 @@
 import ast
 import os
+import re
 
 SERIAL_FILE = "serializers.py"
 MODELS_FILE = "models.py"
@@ -7,7 +8,7 @@ VIEWS_FILE = "views.py"
 URLS_FILE = "urls.py"
 ADMIN_FILE = "admin.py"
 FORMS_FILE = "forms.py"
-FORMS_DIR = "forms"
+FORMS_DIR = "templates"
 
 VOCALES = {
     'a', 'e', 'i', 'o', 'u',
@@ -22,19 +23,44 @@ def parse_models(file_path):
 
     models = []
     for node in tree.body:
-        if isinstance(node, ast.ClassDef):  # es una clase
+        if isinstance(node, ast.ClassDef):
             for base in node.bases:
-                if isinstance(base, ast.Attribute) and base.attr == "Model":  # hereda de models.Model
+                if isinstance(base, ast.Attribute) and base.attr == "Model":
                     fields = []
                     for stmt in node.body:
                         if isinstance(stmt, ast.Assign):  
                             target = stmt.targets[0]
-                            # Si el valor de la asignación es un diccionario, ignorar
                             if isinstance(stmt.value, ast.Dict):
                                 continue
-                            # Si es un campo válido (ej: models.CharField)
                             if isinstance(target, ast.Name):
                                 fields.append(target.id)
+                    models.append((node.name, fields))
+    return models
+
+
+def parse_models_with_value(file_path):
+    """Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
+    omitiendo diccionarios definidos dentro de la clase"""
+    with open(file_path, "r", encoding="utf-8") as f:
+        tree = ast.parse(f.read(), filename=file_path)
+
+    models = []
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef):
+            for base in node.bases:
+                if isinstance(base, ast.Attribute) and base.attr == "Model":
+                    fields = {}
+                    for stmt in node.body:
+                        if isinstance(stmt, ast.Assign):  
+                            target = stmt.targets[0]
+                            if isinstance(stmt.value, ast.Dict):
+                                continue
+                            if isinstance(target, ast.Name):
+                                try:
+                                    value = ast.unparse(stmt.value)
+                                except AttributeError:
+                                    value = str(stmt.value)
+                                fields[target.id] = value
                     models.append((node.name, fields))
     return models
 
@@ -126,6 +152,7 @@ def generate_urls(models):
         "from django.contrib import admin",
         "from django.urls import path",
         "from . import views",
+        "from . import forms",
         "",
         "urlpatterns = [",
         "    path('admin/', admin.site.urls),",
@@ -147,6 +174,7 @@ def generate_urls(models):
         lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
         lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
         lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
+        lines.append(f"    path('formulario{model.lower()}/', forms.Formulario{model}),")
     lines.append("]")
     return "\n".join(lines)
 
@@ -170,37 +198,38 @@ def generate_forms(models):
         "from .models import *",
         "",
     ]
-    for model, fields in models.items():
+    for model, fields in models:
         class_name = f"{model}Form"
         forms_code.append(f"class {class_name}(forms.Form):")
-        for field, ftype in fields:
-            if ftype in ["CharField", "TextField"]:
-                forms_code.append(f"    {field} = forms.CharField(label='{field}', max_length=255)")
-            elif ftype in ["IntegerField", "BigAutoField"]:
-                forms_code.append(f"    {field} = forms.IntegerField(label='{field}')")
-            else:
-                forms_code.append(f"    {field} = forms.CharField(label='{field}')")
+        
+        for field in fields.items():
+            name = field[0]
+            value = field[1].replace("models", "forms")
+            value = field[1].replace("BigAutoField(primary_key=True)", "IntegerField()")
+            value = re.sub("ForeignKey\([a-zA-Z\,\.\ _=]*\)", "IntegerField()", value)
+            value = re.sub(", choices=[A-Z]*", "", value)
+            forms_code.append(f"    {name} = {value}")
         
         forms_code.append("")
-        func_name = f"get_{model.lower()}"
+        func_name = f"Formulario{model}"
         forms_code.append(f"def {func_name}(request):")
         forms_code.append(f"    if request.method == 'POST':")
         forms_code.append(f"        form = {class_name}(request.POST)")
         forms_code.append(f"        if form.is_valid():")
-        forms_code.append(f"            # Guardar en la BD con el modelo real")
         forms_code.append(f"            obj = {model}(**form.cleaned_data)")
         forms_code.append(f"            obj.save()")
         forms_code.append(f"            return HttpResponseRedirect('/thanks/')")
-        forms_code.append("    else:")
+        forms_code.append(f"    else:")
         forms_code.append(f"        form = {class_name}()")
         forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
         forms_code.append("")
-        html_code = """<form method="post">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Submit">
-        </form>"""
-        with open(os.path.join(FORMS_DIR, f"{model.lower()}.html"), "w", encoding="utf-8") as f:
+        html_code = """
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>"""
+        with open(os.path.join("..", FORMS_DIR, f"{model.lower()}.html"), "w", encoding="utf-8") as f:
             f.write(html_code)
 
     with open(FORMS_FILE, "w", encoding="utf-8") as f:
@@ -222,7 +251,8 @@ def main():
     with open(ADMIN_FILE, "w", encoding="utf-8") as f:
         f.write(generate_admin(models))
 
-    #generate_forms(models)
+    models = parse_models_with_value(MODELS_FILE)
+    generate_forms(models)
 
     print("Archivos generados correctamente!")
 
