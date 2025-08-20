@@ -199,6 +199,12 @@ def generate_forms(models):
         "",
     ]
     for model, fields in models:
+        html_code = """
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>"""
         class_name = f"{model}Form"
         forms_code.append(f"class {class_name}(forms.Form):")
         
@@ -223,12 +229,7 @@ def generate_forms(models):
         forms_code.append(f"        form = {class_name}()")
         forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
         forms_code.append("")
-        html_code = """
-<form method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-</form>"""
+        
         with open(os.path.join("..", FORMS_DIR, f"{model.lower()}.html"), "w", encoding="utf-8") as f:
             f.write(html_code)
 

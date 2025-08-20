@@ -64,21 +64,24 @@ def FormularioProyecto(request):
         form = ProyectoForm()
     return render(request, 'proyecto.html', {'form': form})
 
-class PersonaForm(forms.Form):
-    ID = models.IntegerField()
-    Nombre = models.CharField(max_length=200)
-    Sexo = models.CharField(max_length=30)
-    RUT = models.CharField(max_length=12)
+class PersonaForm(forms.ModelForm):
+    class Meta:
+        model = Persona
+        fields = ('ID', 'Nombre', 'Sexo', 'RUT')
 
 def FormularioPersona(request):
+    context = {}
     if request.method == 'POST':
         form = PersonaForm(request.POST)
         if form.is_valid():
             obj = Persona(**form.cleaned_data)
             obj.save()
             return HttpResponseRedirect('/thanks/')
-    else:
+    if request.method == 'GET':
         form = PersonaForm()
+        context['nombre'] = "Nombre"
+        context['sexo'] = "Sexo"
+        context['rut'] = "RUT"
     return render(request, 'persona.html', {'form': form})
 
 class MiembroForm(forms.Form):
