@@ -49,9 +49,10 @@ class Ubicacion(models.Model):
 '''
 Clase que representa la empresa, emprendimiento, grupo de investigacion, etc.
 que desea postular al fondo. La informacion debe regirse por la descripcion
-legal de la empresa. Los datos pueden buscarse en:
+legal de la empresa.
 https://www.registrodeempresasysociedades.cl/MarcaDominio.aspx
 https://www.rutificador.co/empresas/buscar
+https://registros19862.gob.cl/
 https://dequienes.cl/
 '''
 class Beneficiario(models.Model):
@@ -118,6 +119,7 @@ class Persona(models.Model):
 
 '''
 Clase que representa a una persona que es parte de una empresa, agrupacion o grupo de investigacion.
+https://dequienes.cl/
 '''
 class Miembro(models.Model):
 	ID = models.BigAutoField(primary_key=True)
@@ -126,6 +128,7 @@ class Miembro(models.Model):
 
 '''
 Clase que representa a una persona que es parte de un proyecto que busca fondos.
+https://dequienes.cl/
 '''
 class Colaborador(models.Model):
 	ID = models.BigAutoField(primary_key=True)
@@ -152,12 +155,45 @@ class Consorcio(models.Model):
 	SegundoBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='segundo')
 
 '''
-Clase que representa las entes financieras que ofrecen los fondos
+Clase que representa las entes financieras que ofrecen los fondos.
+En muchos sentidos operan de la misma forma que las entes benficiarias,
+lo unico que cambia en rigor son sus relaciones con las otras clases.
+https://www.registrodeempresasysociedades.cl/MarcaDominio.aspx
+https://www.rutificador.co/empresas/buscar
+https://registros19862.gob.cl/
+https://dequienes.cl/
 '''
 class Financiador(models.Model):
+	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
+	PERSONA = {
+		"JU": "Juridica",
+		"NA": "Natural"
+	}
+	# https://ipp.cl/general/tipos-de-empresas-en-chile/
+	EMPRESA = {
+		"SA": "Sociedad Anonima",
+		"SRL": "Sociedad de Responsabilidad Limitada",
+		"SPA": "Sociedad por Acciones",
+		"EIRL": "Empresa Individual de Responsabilidad Limitada"
+	}
+	# https://corfo.cl/sites/cpp/programasyconvocatorias/
+	PERFIL = {
+		"EMP": "Empresa",
+		"EXT": "Extranjero",
+		"INS": "Institucion",
+		"MED": "Intermediario",
+		"ORG": "Organizacion",
+		"PER": "Persona"
+	}
 	ID = models.BigAutoField(primary_key=True)
-	Institucion = models.CharField(max_length=100)
-	Tipo = models.CharField(max_length=100)
+	Nombre = models.CharField(max_length=100)
+	FechaDeCreacion = models.DateField()
+	LugarDeCreacion = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
+	TipoDePersona = models.CharField(max_length=30, choices=PERSONA)
+	TipoDeEmpresa = models.CharField(max_length=30, choices=EMPRESA)
+	Perfil = models.CharField(max_length=30, choices=PERFIL)
+	RUTdeEmpresa = models.CharField(max_length=12)
+	RUTdeRepresentante = models.CharField(max_length=12)
 
 '''
 Clase que representa los fondos concursables a los que los proyectos pueden postular.
@@ -220,6 +256,7 @@ class Instrumento(models.Model):
 
 '''
 Clase que representa las postulaciones de un proyecto a un fondo
+https://registros19862.gob.cl/
 '''
 class Postulacion(models.Model):
 	RESULTADO = {
