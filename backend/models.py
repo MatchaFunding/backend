@@ -116,17 +116,26 @@ class Persona(models.Model):
 	Sexo = models.CharField(max_length=30, choices=SEXO)
 	RUT = models.CharField(max_length=12)
 
-class MiembroDeUnaEmpresa(models.Model):
+'''
+Clase que representa a una persona que es parte de una empresa, agrupacion o grupo de investigacion.
+'''
+class Miembro(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
 	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
 
-class MiembroDeProyecto(models.Model):
+'''
+Clase que representa a una persona que es parte de un proyecto que busca fondos.
+'''
+class Colaborador(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
 	Proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
 
-class UsuarioDeMatchaFunding(models.Model):
+'''
+Clase que representa a un usuario de matchafunding.
+'''
+class Usuario(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
 	NombreDeUsuario = models.CharField(max_length=200, null=False)
@@ -137,7 +146,7 @@ class UsuarioDeMatchaFunding(models.Model):
 Agrupacion de multiples empresas y agrupaciones que pretenden postular
 en conjunto a un instrumento / fondo comun.
 '''
-class ConsorcioDeBeneficiarios(models.Model):
+class Consorcio(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	PrimerBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='primero')
 	SegundoBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='segundo')

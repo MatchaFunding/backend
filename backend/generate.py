@@ -1,11 +1,16 @@
 import ast
 import os
 
-MODELS_FILE = "models.py"
 SERIALIZERS_FILE = "serializers.py"
+MODELS_FILE = "models.py"
 VIEWS_FILE = "views.py"
 URLS_FILE = "urls.py"
+ADMIN_FILE = "admin.py"
 
+VOCALES = {
+    'a', 'e', 'i', 'o', 'u',
+    'A', 'E', 'I', 'O', 'U'
+}
 
 def parse_models(file_path):
     """Parsea models.py y devuelve una lista de clases modelo con sus campos"""
@@ -34,10 +39,10 @@ def generate_serializers(models):
     ]
     for model, fields in models:
         lines.append(f"class {model}Serializado(serializers.ModelSerializer):")
-        lines.append("    class Meta:")
+        lines.append(f"    class Meta:")
         lines.append(f"        model = {model}")
         lines.append(f"        fields = {tuple(fields)}")
-        lines.append("")
+        lines.append(f"")
     return "\n".join(lines)
 
 
@@ -58,40 +63,52 @@ def generate_views(models):
 
     for model, _ in models:
         serializer = f"{model}Serializado"
+        modelplural = str(model)
+        todes = ""
 
+        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
+            todes = "TodasLas"
+        else:
+            todes = "TodosLos"
+        
+        if modelplural[-1] in VOCALES:
+            modelplural += "s"
+        else:
+            modelplural += "es"
+        
         # GET
-        lines.append("@api_view(['GET'])")
-        lines.append(f"def Leer{model}(request):")
+        lines.append(f"@api_view(['GET'])")
+        lines.append(f"def Ver{todes}{modelplural}(request):")
         lines.append(f"    result = {model}.objects.all()")
         lines.append(f"    serializer = {serializer}(result, many=True)")
-        lines.append("    return Response(serializer.data)")
-        lines.append("")
-
+        lines.append(f"    return Response(serializer.data)")
+        lines.append(f"")
+        
         # POST
-        lines.append("@api_view(['POST'])")
+        lines.append(f"@api_view(['POST'])")
         lines.append(f"def Crear{model}(request):")
-        lines.append("    if request.method == 'POST':")
+        lines.append(f"    if request.method == 'POST':")
         lines.append(f"        serializer = {serializer}(data=request.data)")
-        lines.append("        if serializer.is_valid():")
-        lines.append("            serializer.save()")
-        lines.append("            return Response(serializer.data, status=status.HTTP_201_CREATED)")
-        lines.append("    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)")
-        lines.append("")
+        lines.append(f"        if serializer.is_valid():")
+        lines.append(f"            serializer.save()")
+        lines.append(f"            return Response(serializer.data, status=status.HTTP_201_CREATED)")
+        lines.append(f"    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)")
+        lines.append(f"")
 
         # PUT
-        lines.append("@api_view(['PUT'])")
+        lines.append(f"@api_view(['PUT'])")
         lines.append(f"def Cambiar{model}(request, pk=None):")
         lines.append(f"    try:")
         lines.append(f"        instance = {model}.objects.get(pk=pk)")
-        lines.append("    except Exception as e:")
+        lines.append(f"    except Exception as e:")
         lines.append("        return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)")
-        lines.append("")
+        lines.append(f"")
         lines.append(f"    serializer = {serializer}(instance, data=request.data)")
-        lines.append("    if serializer.is_valid():")
-        lines.append("        serializer.save()")
-        lines.append("        return Response(serializer.data)")
-        lines.append("    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)")
-        lines.append("")
+        lines.append(f"    if serializer.is_valid():")
+        lines.append(f"        serializer.save()")
+        lines.append(f"        return Response(serializer.data)")
+        lines.append(f"    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)")
+        lines.append(f"")
 
     return "\n".join(lines)
 
@@ -106,15 +123,43 @@ def generate_urls(models):
         "    path('admin/', admin.site.urls),",
     ]
     for model, _ in models:
-        lines.append(f"    path('leer{model.lower()}s/', views.Leer{model}),")
+        modelplural = str(model)
+        todes = ""
+
+        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
+            todes = "TodasLas"
+        else:
+            todes = "TodosLos"
+        
+        if modelplural[-1] in VOCALES:
+            modelplural += "s"
+        else:
+            modelplural += "es"
+
+        lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
         lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
         lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
     lines.append("]")
     return "\n".join(lines)
 
 
+def generate_admin(models):
+    lines = [
+        "from django.contrib import admin",
+        "from .models import *",
+        ""
+    ]
+    for model, _ in models:
+        lines.append(f"admin.site.register({model})")
+    return "\n".join(lines)
+
+
 def main():
     models = parse_models(MODELS_FILE)
+    os.remove(f"./{SERIALIZERS_FILE}")
+    os.remove(f"./{VIEWS_FILE}")
+    os.remove(f"./{URLS_FILE}")
+    os.remove(f"./{ADMIN_FILE}")
 
     with open(SERIALIZERS_FILE, "w", encoding="utf-8") as f:
         f.write(generate_serializers(models))
@@ -125,7 +170,10 @@ def main():
     with open(URLS_FILE, "w", encoding="utf-8") as f:
         f.write(generate_urls(models))
 
-    print("Archivos serializers.py, views.py y urls.py generados correctamente.")
+    with open(ADMIN_FILE, "w", encoding="utf-8") as f:
+        f.write(generate_admin(models))
+
+    print("Archivos serializers.py, views.py, urls.py y admin.py generados correctamente.")
 
 
 if __name__ == "__main__":

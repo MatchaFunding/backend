@@ -21,24 +21,24 @@ class PersonaSerializado(serializers.ModelSerializer):
         model = Persona
         fields = ('SEXO', 'ID', 'Nombre', 'Sexo', 'RUT')
 
-class MiembroDeUnaEmpresaSerializado(serializers.ModelSerializer):
+class MiembroSerializado(serializers.ModelSerializer):
     class Meta:
-        model = MiembroDeUnaEmpresa
+        model = Miembro
         fields = ('ID', 'Persona', 'Beneficiario')
 
-class MiembroDeProyectoSerializado(serializers.ModelSerializer):
+class ColaboradorSerializado(serializers.ModelSerializer):
     class Meta:
-        model = MiembroDeProyecto
+        model = Colaborador
         fields = ('ID', 'Persona', 'Proyecto')
 
-class UsuarioDeMatchaFundingSerializado(serializers.ModelSerializer):
+class UsuarioSerializado(serializers.ModelSerializer):
     class Meta:
-        model = UsuarioDeMatchaFunding
+        model = Usuario
         fields = ('ID', 'Persona', 'NombreDeUsuario', 'Contrasena', 'Correo')
 
-class ConsorcioDeBeneficiariosSerializado(serializers.ModelSerializer):
+class ConsorcioSerializado(serializers.ModelSerializer):
     class Meta:
-        model = ConsorcioDeBeneficiarios
+        model = Consorcio
         fields = ('ID', 'PrimerBeneficiario', 'SegundoBeneficiario')
 
 class FinanciadorSerializado(serializers.ModelSerializer):

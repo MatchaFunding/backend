@@ -10,7 +10,7 @@ import json
 from django.db.models import *
 
 @api_view(['GET'])
-def LeerUbicacion(request):
+def VerTodasLasUbicaciones(request):
     result = Ubicacion.objects.all()
     serializer = UbicacionSerializado(result, many=True)
     return Response(serializer.data)
@@ -38,7 +38,7 @@ def CambiarUbicacion(request, pk=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerBeneficiario(request):
+def VerTodosLosBeneficiarios(request):
     result = Beneficiario.objects.all()
     serializer = BeneficiarioSerializado(result, many=True)
     return Response(serializer.data)
@@ -66,7 +66,7 @@ def CambiarBeneficiario(request, pk=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerProyecto(request):
+def VerTodosLosProyectos(request):
     result = Proyecto.objects.all()
     serializer = ProyectoSerializado(result, many=True)
     return Response(serializer.data)
@@ -94,7 +94,7 @@ def CambiarProyecto(request, pk=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerPersona(request):
+def VerTodasLasPersonas(request):
     result = Persona.objects.all()
     serializer = PersonaSerializado(result, many=True)
     return Response(serializer.data)
@@ -122,119 +122,119 @@ def CambiarPersona(request, pk=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerMiembroDeUnaEmpresa(request):
-    result = MiembroDeUnaEmpresa.objects.all()
-    serializer = MiembroDeUnaEmpresaSerializado(result, many=True)
+def VerTodosLosMiembros(request):
+    result = Miembro.objects.all()
+    serializer = MiembroSerializado(result, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
-def CrearMiembroDeUnaEmpresa(request):
+def CrearMiembro(request):
     if request.method == 'POST':
-        serializer = MiembroDeUnaEmpresaSerializado(data=request.data)
+        serializer = MiembroSerializado(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
-def CambiarMiembroDeUnaEmpresa(request, pk=None):
+def CambiarMiembro(request, pk=None):
     try:
-        instance = MiembroDeUnaEmpresa.objects.get(pk=pk)
+        instance = Miembro.objects.get(pk=pk)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = MiembroDeUnaEmpresaSerializado(instance, data=request.data)
+    serializer = MiembroSerializado(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerMiembroDeProyecto(request):
-    result = MiembroDeProyecto.objects.all()
-    serializer = MiembroDeProyectoSerializado(result, many=True)
+def VerTodosLosColaboradores(request):
+    result = Colaborador.objects.all()
+    serializer = ColaboradorSerializado(result, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
-def CrearMiembroDeProyecto(request):
+def CrearColaborador(request):
     if request.method == 'POST':
-        serializer = MiembroDeProyectoSerializado(data=request.data)
+        serializer = ColaboradorSerializado(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
-def CambiarMiembroDeProyecto(request, pk=None):
+def CambiarColaborador(request, pk=None):
     try:
-        instance = MiembroDeProyecto.objects.get(pk=pk)
+        instance = Colaborador.objects.get(pk=pk)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = MiembroDeProyectoSerializado(instance, data=request.data)
+    serializer = ColaboradorSerializado(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerUsuarioDeMatchaFunding(request):
-    result = UsuarioDeMatchaFunding.objects.all()
-    serializer = UsuarioDeMatchaFundingSerializado(result, many=True)
+def VerTodosLosUsuarios(request):
+    result = Usuario.objects.all()
+    serializer = UsuarioSerializado(result, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
-def CrearUsuarioDeMatchaFunding(request):
+def CrearUsuario(request):
     if request.method == 'POST':
-        serializer = UsuarioDeMatchaFundingSerializado(data=request.data)
+        serializer = UsuarioSerializado(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
-def CambiarUsuarioDeMatchaFunding(request, pk=None):
+def CambiarUsuario(request, pk=None):
     try:
-        instance = UsuarioDeMatchaFunding.objects.get(pk=pk)
+        instance = Usuario.objects.get(pk=pk)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = UsuarioDeMatchaFundingSerializado(instance, data=request.data)
+    serializer = UsuarioSerializado(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerConsorcioDeBeneficiarios(request):
-    result = ConsorcioDeBeneficiarios.objects.all()
-    serializer = ConsorcioDeBeneficiariosSerializado(result, many=True)
+def VerTodosLosConsorcios(request):
+    result = Consorcio.objects.all()
+    serializer = ConsorcioSerializado(result, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
-def CrearConsorcioDeBeneficiarios(request):
+def CrearConsorcio(request):
     if request.method == 'POST':
-        serializer = ConsorcioDeBeneficiariosSerializado(data=request.data)
+        serializer = ConsorcioSerializado(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
-def CambiarConsorcioDeBeneficiarios(request, pk=None):
+def CambiarConsorcio(request, pk=None):
     try:
-        instance = ConsorcioDeBeneficiarios.objects.get(pk=pk)
+        instance = Consorcio.objects.get(pk=pk)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = ConsorcioDeBeneficiariosSerializado(instance, data=request.data)
+    serializer = ConsorcioSerializado(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerFinanciador(request):
+def VerTodosLosFinanciadores(request):
     result = Financiador.objects.all()
     serializer = FinanciadorSerializado(result, many=True)
     return Response(serializer.data)
@@ -262,7 +262,7 @@ def CambiarFinanciador(request, pk=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerInstrumento(request):
+def VerTodosLosInstrumentos(request):
     result = Instrumento.objects.all()
     serializer = InstrumentoSerializado(result, many=True)
     return Response(serializer.data)
@@ -290,7 +290,7 @@ def CambiarInstrumento(request, pk=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def LeerPostulacion(request):
+def VerTodasLasPostulaciones(request):
     result = Postulacion.objects.all()
     serializer = PostulacionSerializado(result, many=True)
     return Response(serializer.data)
