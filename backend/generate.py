@@ -160,21 +160,24 @@ def generate_urls(models):
     for model, _ in models:
         modelplural = str(model)
         todes = ""
-
         if modelplural[-1] == "a" or modelplural[-4:] == "cion":
             todes = "TodasLas"
         else:
             todes = "TodosLos"
-        
         if modelplural[-1] in VOCALES:
             modelplural += "s"
         else:
             modelplural += "es"
-
         lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
+        
+    for model, _ in models:
         lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
+        
+    for model, _ in models:
         lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
-        lines.append(f"    path('formulario{model.lower()}/', forms.Formulario{model}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
     lines.append("]")
     return "\n".join(lines)
 
@@ -205,28 +208,25 @@ def generate_forms(models):
     {{ form }}
     <input type="submit" value="Submit">
 </form>"""
-        class_name = f"{model}Form"
-        forms_code.append(f"class {class_name}(forms.Form):")
-        
-        for field in fields.items():
-            name = field[0]
-            value = field[1].replace("models", "forms")
-            value = field[1].replace("BigAutoField(primary_key=True)", "IntegerField()")
-            value = re.sub("ForeignKey\([a-zA-Z\,\.\ _=]*\)", "IntegerField()", value)
-            value = re.sub(", choices=[A-Z]*", "", value)
-            forms_code.append(f"    {name} = {value}")
-        
+        formfields = tuple(fields)
+        forms_code.append(f"class {model}Form(forms.ModelForm):")
+        forms_code.append(f"    class Meta:")
+        forms_code.append(f"        model = {model}")
+        forms_code.append(f"        fields = {formfields}")
         forms_code.append("")
-        func_name = f"Formulario{model}"
-        forms_code.append(f"def {func_name}(request):")
+        forms_code.append(f"def VerFormulario{model}(request):")
+        forms_code.append("    context = {}")
         forms_code.append(f"    if request.method == 'POST':")
-        forms_code.append(f"        form = {class_name}(request.POST)")
+        forms_code.append(f"        form = {model}Form(request.POST)")
         forms_code.append(f"        if form.is_valid():")
         forms_code.append(f"            obj = {model}(**form.cleaned_data)")
         forms_code.append(f"            obj.save()")
         forms_code.append(f"            return HttpResponseRedirect('/thanks/')")
-        forms_code.append(f"    else:")
-        forms_code.append(f"        form = {class_name}()")
+        forms_code.append(f"    if request.method == 'GET':")
+        forms_code.append(f"        form = {model}Form()")
+        for field in formfields:
+            if field != "ID":
+                forms_code.append(f"        context['{field.lower()}'] = '{field}'")
         forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
         forms_code.append("")
         

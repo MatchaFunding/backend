@@ -5,22 +5,22 @@ Clase compartida para representar la ubicaion de un objeto.
 '''
 class Ubicacion(models.Model):
 	REGIONES = {
-		"AP": "Región de Aysén del General Carlos Ibáñez del Campo",
-		"TA": "Región de Magallanes y de la Antártica Chilena",
-		"AN": "Región de Arica y Parinacota",
+		"AP": "Región de Arica y Parinacota",
+		"TA": "Región de Tarapacá",
+		"AN": "Región de Antofagasta",
 		"AT": "Región de Atacama",
-		"CO": "Región de Tarapacá",
-		"VA": "Región de Los Ríos",
-		"RM": "Región de Ñuble",
-		"LI": "Región de Antofagasta",
-		"ML": "Región de Coquimbo",
-		"NB": "Región de Los Lagos",
-		"BI": "Región del Libertador General Bernardo O'Higgins",
+		"CO": "Región de Coquimbo",
+		"VA": "Región de Valparaíso",
+		"RM": "Región Metropolitana de Santiago",
+		"LI": "Región del Libertador General Bernardo O'Higgins",
+		"ML": "Región del Maule",
+		"NB": "Región de Ñuble",
+		"BI": "Región del Biobío",
 		"AR": "Región de La Araucanía",
-		"LR": "Región del Maule",
-		"LL": "Región del Biobío",
-		"AI": "Región de Valparaíso",
-		"MA": "Región Metropolitana de Santiago"
+		"LR": "Región de Los Ríos",
+		"LL": "Región de Los Lagos",
+		"AI": "Región de Aysén del General Carlos Ibáñez del Campo",
+		"MA": "Región de Magallanes y de la Antártica Chilena"
 	}
 	CAPITALES = {
 		"AP": "Arica y Parinacota",
