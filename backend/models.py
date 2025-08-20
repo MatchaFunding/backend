@@ -146,7 +146,7 @@ class Usuario(models.Model):
 	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
 	NombreDeUsuario = models.CharField(max_length=200, null=False)
 	Contrasena = models.CharField(max_length=200, null=False)
-	Correo = models.CharField(max_length=200, null=False)
+	Correo = models.EmailField(max_length=200, null=False)
 
 '''
 Agrupacion de multiples empresas y agrupaciones que pretenden postular
@@ -254,8 +254,8 @@ class Instrumento(models.Model):
 	Estado = models.CharField(max_length=30, choices=ESTADO)
 	TipoDeBeneficio = models.CharField(max_length=30, choices=BENEFICIO)
 	TipoDePerfil = models.CharField(max_length=30, choices=PERSONA)
-	EnlaceDelDetalle = models.CharField(max_length=300)
-	EnlaceDeLaFoto = models.CharField(max_length=300)
+	EnlaceDelDetalle = models.URLField(max_length=300)
+	EnlaceDeLaFoto = models.URLField(max_length=300)
 
 '''
 Clase que representa las postulaciones de un proyecto a un fondo
