@@ -123,7 +123,7 @@ MySQL [(none)]> SHOW DATABASES;
 Descargar el archivo _matchafunding.conf_ y guardarlo en *_C:/_*, este sera
 usado por Django para conectarse a la Base de Datos creada.
 
-Finalmente, estando en la carpeta _matcha-funding/database_, ejecutar los
+Finalmente, estando en la carpeta _/backend_ (raíz), ejecutar los
 comandos a continuacion para crear las Tablas en la Base de Datos.
 ```
 C:\Python312\python.exe manage.py makemigrations backend
