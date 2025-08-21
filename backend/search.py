@@ -1,7 +1,13 @@
+from rest_framework.response import Response
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django import forms
+from .serializers import *
 from .models import *
+
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.template import Template, Context
 
 class UbicacionBusqueda(forms.ModelForm):
     class Meta:
@@ -10,11 +16,12 @@ class UbicacionBusqueda(forms.ModelForm):
 
 def VerBusquedaUbicacion(request):
     context = {}
+    result = Ubicacion.objects.all()
+    serializer = UbicacionSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = UbicacionBusqueda(request.POST)
-        if form.is_valid():
-            obj = Ubicacion(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = UbicacionBusqueda()
         context['region'] = 'Region'
@@ -28,24 +35,34 @@ class BeneficiarioBusqueda(forms.ModelForm):
         model = Beneficiario
         fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
+SEARCH_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Búsqueda de Beneficiarios</title>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="q" placeholder="Nombre del beneficiario" required>
+        <button type="submit">Buscar</button>
+    </form>
+</body>
+</html>
+"""
+@csrf_exempt
 def VerBusquedaBeneficiario(request):
-    context = {}
-    if request.method == 'POST':
-        form = BeneficiarioBusqueda(request.POST)
-        if form.is_valid():
-            obj = Beneficiario(**form.cleaned_data)
-            obj.save()
-    if request.method == 'GET':
-        form = BeneficiarioBusqueda()
-        context['nombre'] = 'Nombre'
-        context['fechadecreacion'] = 'FechaDeCreacion'
-        context['lugardecreacion'] = 'LugarDeCreacion'
-        context['tipodepersona'] = 'TipoDePersona'
-        context['tipodeempresa'] = 'TipoDeEmpresa'
-        context['perfil'] = 'Perfil'
-        context['rutdeempresa'] = 'RUTdeEmpresa'
-        context['rutderepresentante'] = 'RUTdeRepresentante'
-    return render(request, 'search.html', {'form': form})
+    if request.method == "GET":
+        tmpl = Template(SEARCH_TEMPLATE)
+        html = tmpl.render(Context({}))
+        return HttpResponse(html)
+    elif request.method == "POST":
+        query = request.POST.get("q", "")
+        if not query:
+            return JsonResponse({"error": "Debe ingresar un término de búsqueda"}, status=400)
+        result = Beneficiario.objects.filter(Nombre__iregex=query) | Beneficiario.objects.filter(Nombre__icontains=query)
+        serializer = BeneficiarioSerializado(result, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
 class ProyectoBusqueda(forms.ModelForm):
     class Meta:
@@ -54,11 +71,12 @@ class ProyectoBusqueda(forms.ModelForm):
 
 def VerBusquedaProyecto(request):
     context = {}
+    result = Proyecto.objects.all()
+    serializer = ProyectoSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = ProyectoBusqueda(request.POST)
-        if form.is_valid():
-            obj = Proyecto(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = ProyectoBusqueda()
         context['beneficiario'] = 'Beneficiario'
@@ -77,11 +95,12 @@ class PersonaBusqueda(forms.ModelForm):
 
 def VerBusquedaPersona(request):
     context = {}
+    result = Persona.objects.all()
+    serializer = PersonaSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = PersonaBusqueda(request.POST)
-        if form.is_valid():
-            obj = Persona(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = PersonaBusqueda()
         context['nombre'] = 'Nombre'
@@ -96,11 +115,12 @@ class MiembroBusqueda(forms.ModelForm):
 
 def VerBusquedaMiembro(request):
     context = {}
+    result = Miembro.objects.all()
+    serializer = MiembroSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = MiembroBusqueda(request.POST)
-        if form.is_valid():
-            obj = Miembro(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = MiembroBusqueda()
         context['persona'] = 'Persona'
@@ -114,11 +134,12 @@ class ColaboradorBusqueda(forms.ModelForm):
 
 def VerBusquedaColaborador(request):
     context = {}
+    result = Colaborador.objects.all()
+    serializer = ColaboradorSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = ColaboradorBusqueda(request.POST)
-        if form.is_valid():
-            obj = Colaborador(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = ColaboradorBusqueda()
         context['persona'] = 'Persona'
@@ -132,11 +153,12 @@ class UsuarioBusqueda(forms.ModelForm):
 
 def VerBusquedaUsuario(request):
     context = {}
+    result = Usuario.objects.all()
+    serializer = UsuarioSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = UsuarioBusqueda(request.POST)
-        if form.is_valid():
-            obj = Usuario(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = UsuarioBusqueda()
         context['persona'] = 'Persona'
@@ -152,11 +174,12 @@ class ConsorcioBusqueda(forms.ModelForm):
 
 def VerBusquedaConsorcio(request):
     context = {}
+    result = Consorcio.objects.all()
+    serializer = ConsorcioSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = ConsorcioBusqueda(request.POST)
-        if form.is_valid():
-            obj = Consorcio(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = ConsorcioBusqueda()
         context['primerbeneficiario'] = 'PrimerBeneficiario'
@@ -170,11 +193,12 @@ class FinanciadorBusqueda(forms.ModelForm):
 
 def VerBusquedaFinanciador(request):
     context = {}
+    result = Financiador.objects.all()
+    serializer = FinanciadorSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = FinanciadorBusqueda(request.POST)
-        if form.is_valid():
-            obj = Financiador(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = FinanciadorBusqueda()
         context['nombre'] = 'Nombre'
@@ -194,11 +218,12 @@ class InstrumentoBusqueda(forms.ModelForm):
 
 def VerBusquedaInstrumento(request):
     context = {}
+    result = Instrumento.objects.all()
+    serializer = InstrumentoSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = InstrumentoBusqueda(request.POST)
-        if form.is_valid():
-            obj = Instrumento(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = InstrumentoBusqueda()
         context['titulo'] = 'Titulo'
@@ -226,11 +251,12 @@ class PostulacionBusqueda(forms.ModelForm):
 
 def VerBusquedaPostulacion(request):
     context = {}
+    result = Postulacion.objects.all()
+    serializer = PostulacionSerializado(result, many=True)
+    response = Response(serializer.data)
     if request.method == 'POST':
         form = PostulacionBusqueda(request.POST)
-        if form.is_valid():
-            obj = Postulacion(**form.cleaned_data)
-            obj.save()
+        print(f'Resultado de busqueda: {serializer.data}')
     if request.method == 'GET':
         form = PostulacionBusqueda()
         context['beneficiario'] = 'Beneficiario'

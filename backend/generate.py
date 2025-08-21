@@ -22,6 +22,12 @@ FORM_HTML = """<form method="post">
 <input type="submit" value="Submit">
 </form>"""
 
+SEARCH_HTML = """<form method="post">
+{% csrf_token %}
+{{ form }}
+<input type="submit" value="Submit">
+</form>"""
+
 def parse_models(file_path):
     """Parsea models.py y devuelve una lista de clases modelo con sus campos, 
     omitiendo diccionarios definidos dentro de la clase"""
@@ -244,9 +250,11 @@ def generate_forms(models):
 
 def generate_search(models):
     forms_code = [
+        "from rest_framework.response import Response",
         "from django.http import HttpResponseRedirect",
         "from django.shortcuts import render",
         "from django import forms",
+        "from .serializers import *",
         "from .models import *",
         "",
     ]
@@ -259,11 +267,12 @@ def generate_search(models):
         forms_code.append("")
         forms_code.append(f"def VerBusqueda{model}(request):")
         forms_code.append("    context = {}")
+        forms_code.append(f"    result = {model}.objects.all()")
+        forms_code.append(f"    serializer = {model}Serializado(result, many=True)")
+        forms_code.append(f"    response = Response(serializer.data)")
         forms_code.append(f"    if request.method == 'POST':")
         forms_code.append(f"        form = {model}Busqueda(request.POST)")
-        forms_code.append(f"        if form.is_valid():")
-        forms_code.append(f"            obj = {model}(**form.cleaned_data)")
-        forms_code.append(f"            obj.save()")
+        forms_code.append("        print(f'Resultado de busqueda: {serializer.data}')")
         forms_code.append(f"    if request.method == 'GET':")
         forms_code.append(f"        form = {model}Busqueda()")
         for field in formfields:
@@ -271,9 +280,31 @@ def generate_search(models):
                 forms_code.append(f"        context['{field.lower()}'] = '{field}'")
         forms_code.append(f"    return render(request, 'search.html', {{'form': form}})")
         forms_code.append("")
-    
+    '''
+    for model, fields in models:
+        formfields = tuple(fields)
+        forms_code.append(f"class {model}Busqueda(forms.ModelForm):")
+        forms_code.append(f"    class Meta:")
+        forms_code.append(f"        model = {model}")
+        forms_code.append(f"        fields = {formfields}")
+        forms_code.append("")
+        forms_code.append(f"def VerBusqueda{model}(request):")
+        forms_code.append("    context = {}")
+        forms_code.append(f"    objects = {model}.objects.all()")
+        forms_code.append(f"    context['objects'] = objects")
+        forms_code.append("    print('Objetos: {objects}')")
+        forms_code.append(f"    if request.method == 'POST':")
+        forms_code.append(f"        form = {model}Busqueda(request.POST)")
+        forms_code.append(f"    if request.method == 'GET':")
+        forms_code.append(f"        form = {model}Busqueda()")
+        for field in formfields:
+            if field != "ID":
+                forms_code.append(f"        context['{field.lower()}'] = '{field}'")
+        forms_code.append(f"    return render(request, 'search.html', {{'form': form, 'objects': objects}})")
+        forms_code.append("")
+    '''
     with open(os.path.join("..", TEMP_DIR, f"search.html"), "w", encoding="utf-8") as f:
-        f.write(FORM_HTML)
+        f.write(SEARCH_HTML)
 
     with open(SEARCH_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
