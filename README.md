@@ -37,32 +37,6 @@ mysql -u {USER} -p{PASSWORD}
 CREATE DATABASE MatchaFundingDB;
 ```
 
-La salida completa debiese verse algo asi.
-
-```
-C:\Users\ElMaikina\Code\matcha-funding\databases> mysql -u {USER} -p{PASSWORD}
-Welcome to the MariaDB monitor.  Commands end with ; or \g.
-Your MySQL connection id is 89
-Server version: 9.2.0 MySQL Community Server - GPL
-
-Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
-
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-
-MySQL [(none)]> CREATE DATABASE MatchaFundingDB;
-MySQL [(none)]> SHOW DATABASES;
-+--------------------+
-| Database           |
-+--------------------+
-| information_schema |
-| matchafundingdb    |
-| mysql              |
-| performance_schema |
-| sys                |
-+--------------------+
-5 rows in set (0.002 sec)
-```
-
 Descargar el archivo _matchafunding.conf_ y guardarlo en *_C:/_*, este sera
 usado por Django para conectarse a la Base de Datos creada.
 
@@ -105,3 +79,17 @@ Para implemtar la _API_ las llamadas deben estar en formato _JSON_.
 
 **Importante**: Los _ID_ de las clases son auto-incrementales, no se deben pasar
 por medio de la llamda.
+
+## Respaldar / Cargar de la Base de Datos
+
+Para respaldar los datos de la base de datos hay que ejecutar el siguiente comando:
+
+```
+mysqldump -u root -p MatchaFundingDB > backup.sql
+```
+
+Para cargar los datos ya respaldados previamente hacer el siguiente comando:
+
+```
+mysql -u root -p MatchaFundingDB < backup.sql
+```
