@@ -21,7 +21,7 @@ def VerFormularioUbicacion(request):
         context['capital'] = 'Capital'
         context['calle'] = 'Calle'
         context['numero'] = 'Numero'
-    return render(request, 'ubicacion.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class BeneficiarioForm(forms.ModelForm):
     class Meta:
@@ -45,7 +45,7 @@ def VerFormularioBeneficiario(request):
         context['perfil'] = 'Perfil'
         context['rutdeempresa'] = 'RUTdeEmpresa'
         context['rutderepresentante'] = 'RUTdeRepresentante'
-    return render(request, 'beneficiario.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class ProyectoForm(forms.ModelForm):
     class Meta:
@@ -68,7 +68,7 @@ def VerFormularioProyecto(request):
         context['duracionenmesesmaximo'] = 'DuracionEnMesesMaximo'
         context['alcance'] = 'Alcance'
         context['area'] = 'Area'
-    return render(request, 'proyecto.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class PersonaForm(forms.ModelForm):
     class Meta:
@@ -87,7 +87,7 @@ def VerFormularioPersona(request):
         context['nombre'] = 'Nombre'
         context['sexo'] = 'Sexo'
         context['rut'] = 'RUT'
-    return render(request, 'persona.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class MiembroForm(forms.ModelForm):
     class Meta:
@@ -105,7 +105,7 @@ def VerFormularioMiembro(request):
         form = MiembroForm()
         context['persona'] = 'Persona'
         context['beneficiario'] = 'Beneficiario'
-    return render(request, 'miembro.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class ColaboradorForm(forms.ModelForm):
     class Meta:
@@ -123,7 +123,7 @@ def VerFormularioColaborador(request):
         form = ColaboradorForm()
         context['persona'] = 'Persona'
         context['proyecto'] = 'Proyecto'
-    return render(request, 'colaborador.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class UsuarioForm(forms.ModelForm):
     class Meta:
@@ -143,7 +143,7 @@ def VerFormularioUsuario(request):
         context['nombredeusuario'] = 'NombreDeUsuario'
         context['contrasena'] = 'Contrasena'
         context['correo'] = 'Correo'
-    return render(request, 'usuario.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class ConsorcioForm(forms.ModelForm):
     class Meta:
@@ -161,7 +161,7 @@ def VerFormularioConsorcio(request):
         form = ConsorcioForm()
         context['primerbeneficiario'] = 'PrimerBeneficiario'
         context['segundobeneficiario'] = 'SegundoBeneficiario'
-    return render(request, 'consorcio.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class FinanciadorForm(forms.ModelForm):
     class Meta:
@@ -185,7 +185,7 @@ def VerFormularioFinanciador(request):
         context['perfil'] = 'Perfil'
         context['rutdeempresa'] = 'RUTdeEmpresa'
         context['rutderepresentante'] = 'RUTdeRepresentante'
-    return render(request, 'financiador.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class InstrumentoForm(forms.ModelForm):
     class Meta:
@@ -217,7 +217,7 @@ def VerFormularioInstrumento(request):
         context['tipodeperfil'] = 'TipoDePerfil'
         context['enlacedeldetalle'] = 'EnlaceDelDetalle'
         context['enlacedelafoto'] = 'EnlaceDeLaFoto'
-    return render(request, 'instrumento.html', {'form': form})
+    return render(request, 'form.html', {'form': form})
 
 class PostulacionForm(forms.ModelForm):
     class Meta:
@@ -241,4 +241,4 @@ def VerFormularioPostulacion(request):
         context['fechadepostulacion'] = 'FechaDePostulacion'
         context['fechaderesultado'] = 'FechaDeResultado'
         context['detalle'] = 'Detalle'
-    return render(request, 'postulacion.html', {'form': form})
+    return render(request, 'form.html', {'form': form})

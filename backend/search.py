@@ -21,7 +21,7 @@ def VerBusquedaUbicacion(request):
         context['capital'] = 'Capital'
         context['calle'] = 'Calle'
         context['numero'] = 'Numero'
-    return render(request, 'ubicacion.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class BeneficiarioBusqueda(forms.ModelForm):
     class Meta:
@@ -45,7 +45,7 @@ def VerBusquedaBeneficiario(request):
         context['perfil'] = 'Perfil'
         context['rutdeempresa'] = 'RUTdeEmpresa'
         context['rutderepresentante'] = 'RUTdeRepresentante'
-    return render(request, 'beneficiario.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class ProyectoBusqueda(forms.ModelForm):
     class Meta:
@@ -68,7 +68,7 @@ def VerBusquedaProyecto(request):
         context['duracionenmesesmaximo'] = 'DuracionEnMesesMaximo'
         context['alcance'] = 'Alcance'
         context['area'] = 'Area'
-    return render(request, 'proyecto.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class PersonaBusqueda(forms.ModelForm):
     class Meta:
@@ -87,7 +87,7 @@ def VerBusquedaPersona(request):
         context['nombre'] = 'Nombre'
         context['sexo'] = 'Sexo'
         context['rut'] = 'RUT'
-    return render(request, 'persona.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class MiembroBusqueda(forms.ModelForm):
     class Meta:
@@ -105,7 +105,7 @@ def VerBusquedaMiembro(request):
         form = MiembroBusqueda()
         context['persona'] = 'Persona'
         context['beneficiario'] = 'Beneficiario'
-    return render(request, 'miembro.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class ColaboradorBusqueda(forms.ModelForm):
     class Meta:
@@ -123,7 +123,7 @@ def VerBusquedaColaborador(request):
         form = ColaboradorBusqueda()
         context['persona'] = 'Persona'
         context['proyecto'] = 'Proyecto'
-    return render(request, 'colaborador.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class UsuarioBusqueda(forms.ModelForm):
     class Meta:
@@ -143,7 +143,7 @@ def VerBusquedaUsuario(request):
         context['nombredeusuario'] = 'NombreDeUsuario'
         context['contrasena'] = 'Contrasena'
         context['correo'] = 'Correo'
-    return render(request, 'usuario.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class ConsorcioBusqueda(forms.ModelForm):
     class Meta:
@@ -161,7 +161,7 @@ def VerBusquedaConsorcio(request):
         form = ConsorcioBusqueda()
         context['primerbeneficiario'] = 'PrimerBeneficiario'
         context['segundobeneficiario'] = 'SegundoBeneficiario'
-    return render(request, 'consorcio.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class FinanciadorBusqueda(forms.ModelForm):
     class Meta:
@@ -185,7 +185,7 @@ def VerBusquedaFinanciador(request):
         context['perfil'] = 'Perfil'
         context['rutdeempresa'] = 'RUTdeEmpresa'
         context['rutderepresentante'] = 'RUTdeRepresentante'
-    return render(request, 'financiador.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class InstrumentoBusqueda(forms.ModelForm):
     class Meta:
@@ -217,7 +217,7 @@ def VerBusquedaInstrumento(request):
         context['tipodeperfil'] = 'TipoDePerfil'
         context['enlacedeldetalle'] = 'EnlaceDelDetalle'
         context['enlacedelafoto'] = 'EnlaceDeLaFoto'
-    return render(request, 'instrumento.html', {'form': form})
+    return render(request, 'search.html', {'form': form})
 
 class PostulacionBusqueda(forms.ModelForm):
     class Meta:
@@ -241,4 +241,4 @@ def VerBusquedaPostulacion(request):
         context['fechadepostulacion'] = 'FechaDePostulacion'
         context['fechaderesultado'] = 'FechaDeResultado'
         context['detalle'] = 'Detalle'
-    return render(request, 'postulacion.html', {'form': form})
+    return render(request, 'search.html', {'form': form})

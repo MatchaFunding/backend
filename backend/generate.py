@@ -9,12 +9,18 @@ URLS_FILE = "urls.py"
 ADMIN_FILE = "admin.py"
 SEARCH_FILE = "search.py"
 FORMS_FILE = "forms.py"
-FORMS_DIR = "templates"
+TEMP_DIR = "templates"
 
 VOCALES = {
     'a', 'e', 'i', 'o', 'u',
     'A', 'E', 'I', 'O', 'U'
 }
+
+FORM_HTML = """<form method="post">
+{% csrf_token %}
+{{ form }}
+<input type="submit" value="Submit">
+</form>"""
 
 def parse_models(file_path):
     """Parsea models.py y devuelve una lista de clases modelo con sus campos, 
@@ -208,12 +214,6 @@ def generate_forms(models):
         "",
     ]
     for model, fields in models:
-        html_code = """
-<form method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-</form>"""
         formfields = tuple(fields)
         forms_code.append(f"class {model}Form(forms.ModelForm):")
         forms_code.append(f"    class Meta:")
@@ -232,11 +232,11 @@ def generate_forms(models):
         for field in formfields:
             if field != "ID":
                 forms_code.append(f"        context['{field.lower()}'] = '{field}'")
-        forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
+        forms_code.append(f"    return render(request, 'form.html', {{'form': form}})")
         forms_code.append("")
-        
-        with open(os.path.join("..", FORMS_DIR, f"{model.lower()}.html"), "w", encoding="utf-8") as f:
-            f.write(html_code)
+    
+    with open(os.path.join("..", TEMP_DIR, f"form.html"), "w", encoding="utf-8") as f:
+        f.write(FORM_HTML)
 
     with open(FORMS_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
@@ -255,7 +255,7 @@ def generate_search(models):
         forms_code.append(f"class {model}Busqueda(forms.ModelForm):")
         forms_code.append(f"    class Meta:")
         forms_code.append(f"        model = {model}")
-        forms_code.append(f"        fields = BuscarPor{formfields}")
+        forms_code.append(f"        fields = {formfields}")
         forms_code.append("")
         forms_code.append(f"def VerBusqueda{model}(request):")
         forms_code.append("    context = {}")
@@ -269,8 +269,11 @@ def generate_search(models):
         for field in formfields:
             if field != "ID":
                 forms_code.append(f"        context['{field.lower()}'] = '{field}'")
-        forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
+        forms_code.append(f"    return render(request, 'search.html', {{'form': form}})")
         forms_code.append("")
+    
+    with open(os.path.join("..", TEMP_DIR, f"search.html"), "w", encoding="utf-8") as f:
+        f.write(FORM_HTML)
 
     with open(SEARCH_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
