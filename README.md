@@ -28,65 +28,6 @@ Al usar _MariaDB_ / _MySQL_ por primera vez debemos crear un user y password
 ```
 mysql_secure_installation.exe
 ```
-Saldra un promp en donde hay que rellenar los datos pedidos con las credenciales
-que estaran en el Discord de MatchaFunding en el canal _db_. Por ejemplo:
-
-```
-PS C:\Users\etrtp\OneDrive\Escritorio\OtherStuff\UTFSM\FDSW\matcha-funding\databases> mysql_secure_installation.exe
-
-Securing the MySQL server deployment.
-
-Connecting to MySQL using a blank password.
-
-VALIDATE PASSWORD COMPONENT can be used to test passwords
-and improve security. It checks the strength of password
-and allows the users to set only those passwords which are
-secure enough. Would you like to setup VALIDATE PASSWORD component?
-
-Press y|Y for Yes, any other key for No: n
-Please set the password for root here.
-
-New password: **
-
-Re-enter new password: **
-By default, a MySQL installation has an anonymous user,
-allowing anyone to log into MySQL without having to have
-a user account created for them. This is intended only for
-testing, and to make the installation go a bit smoother.
-You should remove them before moving into a production
-environment.
-
-Remove anonymous users? (Press y|Y for Yes, any other key for No) : y
-Success.
-
-
-Normally, root should only be allowed to connect from
-'localhost'. This ensures that someone cannot guess at
-the root password from the network.
-
-Disallow root login remotely? (Press y|Y for Yes, any other key for No) : n
-
- ... skipping.
-By default, MySQL comes with a database named 'test' that
-anyone can access. This is also intended only for testing,
-and should be removed before moving into a production
-environment.
-
-
-Remove test database and access to it? (Press y|Y for Yes, any other key for No) : n
-
- ... skipping.
-Reloading the privilege tables will ensure that all changes
-made so far will take effect immediately.
-
-Reload privilege tables now? (Press y|Y for Yes, any other key for No) : n
-
- ... skipping.
-All done!
-
-
-Message #db
-```
 
 Tras configurar _MariaDB_ / _MySQL_ hay que crear la Base de Datos vacia que luego
 sera poblada con las tablas correspondientes por Django.
@@ -95,7 +36,9 @@ sera poblada con las tablas correspondientes por Django.
 mysql -u {USER} -p{PASSWORD}
 CREATE DATABASE MatchaFundingDB;
 ```
+
 La salida completa debiese verse algo asi.
+
 ```
 C:\Users\ElMaikina\Code\matcha-funding\databases> mysql -u {USER} -p{PASSWORD}
 Welcome to the MariaDB monitor.  Commands end with ; or \g.
@@ -125,6 +68,7 @@ usado por Django para conectarse a la Base de Datos creada.
 
 Finalmente, estando en la carpeta _/backend_ (raíz), ejecutar los
 comandos a continuacion para crear las Tablas en la Base de Datos.
+
 ```
 C:\Python312\python.exe manage.py makemigrations backend
 C:\Python312\python.exe manage.py migrate backend
