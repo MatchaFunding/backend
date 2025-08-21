@@ -7,6 +7,7 @@ MODELS_FILE = "models.py"
 VIEWS_FILE = "views.py"
 URLS_FILE = "urls.py"
 ADMIN_FILE = "admin.py"
+SEARCH_FILE = "search.py"
 FORMS_FILE = "forms.py"
 FORMS_DIR = "templates"
 
@@ -153,6 +154,7 @@ def generate_urls(models):
         "from django.urls import path",
         "from . import views",
         "from . import forms",
+        "from . import search",
         "",
         "urlpatterns = [",
         "    path('admin/', admin.site.urls),",
@@ -178,6 +180,10 @@ def generate_urls(models):
         
     for model, _ in models:
         lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
+    
+    for model, _ in models:
+        lines.append(f"    path('busqueda{model.lower()}/', search.VerBusqueda{model}),")
+    
     lines.append("]")
     return "\n".join(lines)
 
@@ -236,6 +242,40 @@ def generate_forms(models):
         f.write("\n".join(forms_code))
 
 
+def generate_search(models):
+    forms_code = [
+        "from django.http import HttpResponseRedirect",
+        "from django.shortcuts import render",
+        "from django import forms",
+        "from .models import *",
+        "",
+    ]
+    for model, fields in models:
+        formfields = tuple(fields)
+        forms_code.append(f"class {model}Busqueda(forms.ModelForm):")
+        forms_code.append(f"    class Meta:")
+        forms_code.append(f"        model = {model}")
+        forms_code.append(f"        fields = BuscarPor{formfields}")
+        forms_code.append("")
+        forms_code.append(f"def VerBusqueda{model}(request):")
+        forms_code.append("    context = {}")
+        forms_code.append(f"    if request.method == 'POST':")
+        forms_code.append(f"        form = {model}Busqueda(request.POST)")
+        forms_code.append(f"        if form.is_valid():")
+        forms_code.append(f"            obj = {model}(**form.cleaned_data)")
+        forms_code.append(f"            obj.save()")
+        forms_code.append(f"    if request.method == 'GET':")
+        forms_code.append(f"        form = {model}Busqueda()")
+        for field in formfields:
+            if field != "ID":
+                forms_code.append(f"        context['{field.lower()}'] = '{field}'")
+        forms_code.append(f"    return render(request, '{model.lower()}.html', {{'form': form}})")
+        forms_code.append("")
+
+    with open(SEARCH_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(forms_code))
+
+
 def main():
     models = parse_models(MODELS_FILE)
 
@@ -253,6 +293,9 @@ def main():
 
     models = parse_models_with_value(MODELS_FILE)
     generate_forms(models)
+
+    models = parse_models_with_value(MODELS_FILE)
+    generate_search(models)
 
     print("Archivos generados correctamente!")
 

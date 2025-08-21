@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 from . import forms
+from . import search
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -49,4 +50,15 @@ urlpatterns = [
     path('formulariofinanciador/', forms.VerFormularioFinanciador),
     path('formularioinstrumento/', forms.VerFormularioInstrumento),
     path('formulariopostulacion/', forms.VerFormularioPostulacion),
+    path('busquedaubicacion/', search.VerBusquedaUbicacion),
+    path('busquedabeneficiario/', search.VerBusquedaBeneficiario),
+    path('busquedaproyecto/', search.VerBusquedaProyecto),
+    path('busquedapersona/', search.VerBusquedaPersona),
+    path('busquedamiembro/', search.VerBusquedaMiembro),
+    path('busquedacolaborador/', search.VerBusquedaColaborador),
+    path('busquedausuario/', search.VerBusquedaUsuario),
+    path('busquedaconsorcio/', search.VerBusquedaConsorcio),
+    path('busquedafinanciador/', search.VerBusquedaFinanciador),
+    path('busquedainstrumento/', search.VerBusquedaInstrumento),
+    path('busquedapostulacion/', search.VerBusquedaPostulacion),
 ]
