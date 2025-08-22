@@ -80,7 +80,7 @@ Para implemtar la _API_ las llamadas deben estar en formato _JSON_.
 **Importante**: Los _ID_ de las clases son auto-incrementales, no se deben pasar
 por medio de la llamda.
 
-## Respaldar / Cargar de la Base de Datos
+## Base de Datos
 
 Para respaldar los datos de la base de datos hay que ejecutar el siguiente comando:
 
@@ -93,3 +93,24 @@ Para cargar los datos ya respaldados previamente hacer el siguiente comando:
 ```
 mysql -u root -p MatchaFundingDB < backup.sql
 ```
+
+
+## TypeScript
+
+Para generar los modelos con typescript hay que modificar el siguiente _script_ en el
+archivo _package.json_:
+
+```
+"build:sequalize-ts": "rimraf ./models &&  sequelize-auto -o \"./models\" -d DATABASE -h HOST -u USER -p 3306 -x PASSWORD -e mysql -l ts"
+```
+
+En donde _HOST_ se remplaza por ```127.0.0.1```, _DATABASE_ se remplaza por MatchaFundingDB
+y las otras credenciales se remplazan por las que estan en Discord.
+
+Finalmente, ejecutar el siguiente comando.
+
+```
+npm run build:sequalize-ts
+```
+
+**Importante**: No subir el archivo con las credenciales guardadas!
