@@ -24,7 +24,7 @@ SEARCH_TEMPLATE = '''
 '''
 
 @csrf_exempt
-def BuscarBeneficiarioPorNombre(request):
+def BuscarBeneficiario(request):
     if request.method == "GET":
         tmpl = Template(SEARCH_TEMPLATE)
         html = tmpl.render(Context({}))
@@ -38,7 +38,7 @@ def BuscarBeneficiarioPorNombre(request):
         return JsonResponse(serializer.data, safe=False)
 
 @csrf_exempt
-def BuscarProyectoPorTitulo(request):
+def BuscarProyecto(request):
     if request.method == "GET":
         tmpl = Template(SEARCH_TEMPLATE)
         html = tmpl.render(Context({}))
@@ -52,7 +52,7 @@ def BuscarProyectoPorTitulo(request):
         return JsonResponse(serializer.data, safe=False)
 
 @csrf_exempt
-def BuscarPersonaPorRUT(request):
+def BuscarPersona(request):
     if request.method == "GET":
         tmpl = Template(SEARCH_TEMPLATE)
         html = tmpl.render(Context({}))
@@ -61,26 +61,12 @@ def BuscarPersonaPorRUT(request):
         query = request.POST.get("q", )
         if not query:
             return JsonResponse({"error": "Debe ingresar un término de búsqueda"}, status=400)
-        result = Persona.objects.filter(RUT__iregex=query) | Persona.objects.filter(RUT__icontains=query)
+        result = Persona.objects.filter(RUT__iregex=query) | Persona.objects.filter(RUT__icontains=query) | Persona.objects.filter(Nombre__iregex=query) | Persona.objects.filter(Nombre__icontains=query)
         serializer = PersonaSerializado(result, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 @csrf_exempt
-def BuscarPersonaPorNombre(request):
-    if request.method == "GET":
-        tmpl = Template(SEARCH_TEMPLATE)
-        html = tmpl.render(Context({}))
-        return HttpResponse(html)
-    elif request.method == "POST":
-        query = request.POST.get("q", )
-        if not query:
-            return JsonResponse({"error": "Debe ingresar un término de búsqueda"}, status=400)
-        result = Persona.objects.filter(Nombre__iregex=query) | Persona.objects.filter(Nombre__icontains=query)
-        serializer = PersonaSerializado(result, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-@csrf_exempt
-def BuscarFinanciadorPorNombre(request):
+def BuscarFinanciador(request):
     if request.method == "GET":
         tmpl = Template(SEARCH_TEMPLATE)
         html = tmpl.render(Context({}))
@@ -94,7 +80,7 @@ def BuscarFinanciadorPorNombre(request):
         return JsonResponse(serializer.data, safe=False)
 
 @csrf_exempt
-def BuscarInstrumentoPorTitulo(request):
+def BuscarInstrumento(request):
     if request.method == "GET":
         tmpl = Template(SEARCH_TEMPLATE)
         html = tmpl.render(Context({}))
