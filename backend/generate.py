@@ -110,26 +110,23 @@ def generate_views(models):
         serializer = f"{model}Serializado"
         modelplural = str(model)
         todes = ""
-
+        # Determina si un modelo es femenino o masculino en plural
         if modelplural[-1] == "a" or modelplural[-4:] == "cion":
             todes = "TodasLas"
         else:
             todes = "TodosLos"
-        
         if modelplural[-1] in VOCALES:
             modelplural += "s"
         else:
             modelplural += "es"
-        
-        # GET
+        # Ver
         lines.append(f"@api_view(['GET'])")
         lines.append(f"def Ver{todes}{modelplural}(request):")
         lines.append(f"    result = {model}.objects.all()")
         lines.append(f"    serializer = {serializer}(result, many=True)")
         lines.append(f"    return Response(serializer.data)")
         lines.append(f"")
-        
-        # POST
+        # Crear
         lines.append(f"@api_view(['POST'])")
         lines.append(f"def Crear{model}(request):")
         lines.append(f"    if request.method == 'POST':")
@@ -139,8 +136,7 @@ def generate_views(models):
         lines.append(f"            return Response(serializer.data, status=status.HTTP_201_CREATED)")
         lines.append(f"    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)")
         lines.append(f"")
-
-        # PUT
+        # Modificar
         lines.append(f"@api_view(['PUT'])")
         lines.append(f"def Cambiar{model}(request, pk=None):")
         lines.append(f"    try:")
@@ -153,6 +149,13 @@ def generate_views(models):
         lines.append(f"        serializer.save()")
         lines.append(f"        return Response(serializer.data)")
         lines.append(f"    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)")
+        lines.append(f"")
+        # Borrar
+        lines.append(f"@api_view(['POST'])")
+        lines.append(f"def Borrar{model}(request, pk=None):")
+        lines.append(f"    member = {model}.objects.get(pk=pk)")
+        lines.append(f"    member.delete()")
+        lines.append(f"    return Response(status=status.HTTP_200_OK)")
         lines.append(f"")
 
     return "\n".join(lines)
@@ -296,6 +299,9 @@ def generate_urls(models):
         
     for model, _ in models:
         lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
+    
+    for model, _ in models:
+        lines.append(f"    path('borrar{model.lower()}/<int:pk>/', views.Borrar{model}),")
         
     for model, _ in models:
         lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
