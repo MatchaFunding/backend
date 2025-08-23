@@ -1,18 +1,18 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { backend_instrumento, backend_instrumentoId } from './backend_instrumento';
-import type { backend_ubicacion, backend_ubicacionId } from './backend_ubicacion';
 
 export interface backend_financiadorAttributes {
   ID: number;
   Nombre: string;
   FechaDeCreacion: string;
+  RegionDeCreacion: string;
+  Direccion: string;
   TipoDePersona: string;
   TipoDeEmpresa: string;
   Perfil: string;
   RUTdeEmpresa: string;
   RUTdeRepresentante: string;
-  LugarDeCreacion_id: number;
 }
 
 export type backend_financiadorPk = "ID";
@@ -24,12 +24,13 @@ export class backend_financiador extends Model<backend_financiadorAttributes, ba
   ID!: number;
   Nombre!: string;
   FechaDeCreacion!: string;
+  RegionDeCreacion!: string;
+  Direccion!: string;
   TipoDePersona!: string;
   TipoDeEmpresa!: string;
   Perfil!: string;
   RUTdeEmpresa!: string;
   RUTdeRepresentante!: string;
-  LugarDeCreacion_id!: number;
 
   // backend_financiador hasMany backend_instrumento via Financiador_id
   backend_instrumentos!: backend_instrumento[];
@@ -43,11 +44,6 @@ export class backend_financiador extends Model<backend_financiadorAttributes, ba
   hasBackend_instrumento!: Sequelize.HasManyHasAssociationMixin<backend_instrumento, backend_instrumentoId>;
   hasBackend_instrumentos!: Sequelize.HasManyHasAssociationsMixin<backend_instrumento, backend_instrumentoId>;
   countBackend_instrumentos!: Sequelize.HasManyCountAssociationsMixin;
-  // backend_financiador belongsTo backend_ubicacion via LugarDeCreacion_id
-  LugarDeCreacion!: backend_ubicacion;
-  getLugarDeCreacion!: Sequelize.BelongsToGetAssociationMixin<backend_ubicacion>;
-  setLugarDeCreacion!: Sequelize.BelongsToSetAssociationMixin<backend_ubicacion, backend_ubicacionId>;
-  createLugarDeCreacion!: Sequelize.BelongsToCreateAssociationMixin<backend_ubicacion>;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof backend_financiador {
     return backend_financiador.init({
@@ -63,6 +59,14 @@ export class backend_financiador extends Model<backend_financiadorAttributes, ba
     },
     FechaDeCreacion: {
       type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    RegionDeCreacion: {
+      type: DataTypes.STRING(30),
+      allowNull: false
+    },
+    Direccion: {
+      type: DataTypes.STRING(300),
       allowNull: false
     },
     TipoDePersona: {
@@ -84,14 +88,6 @@ export class backend_financiador extends Model<backend_financiadorAttributes, ba
     RUTdeRepresentante: {
       type: DataTypes.STRING(12),
       allowNull: false
-    },
-    LugarDeCreacion_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'backend_ubicacion',
-        key: 'ID'
-      }
     }
   }, {
     sequelize,
@@ -104,13 +100,6 @@ export class backend_financiador extends Model<backend_financiadorAttributes, ba
         using: "BTREE",
         fields: [
           { name: "ID" },
-        ]
-      },
-      {
-        name: "backend_financiador_LugarDeCreacion_id_d8f71306_fk_backend_u",
-        using: "BTREE",
-        fields: [
-          { name: "LugarDeCreacion_id" },
         ]
       },
     ]

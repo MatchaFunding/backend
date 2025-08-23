@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:sequalize-ts": "rimraf ./models &&  sequelize-auto -o \"./models\" -d DATABASE -h HOST -u USER -p 3306 -x PASSWORD -e mysql -l ts"
+    "build:sequalize-ts": "rimraf ./models &&  sequelize-auto -o \"./models\" -d MatchaFundingDB -h 127.0.0.1 -u USER -p 3306 -x PASSWORD -e mysql -l ts"
   },
   "repository": {
     "type": "git",

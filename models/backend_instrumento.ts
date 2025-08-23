@@ -2,11 +2,11 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { backend_financiador, backend_financiadorId } from './backend_financiador';
 import type { backend_postulacion, backend_postulacionId } from './backend_postulacion';
-import type { backend_ubicacion, backend_ubicacionId } from './backend_ubicacion';
 
 export interface backend_instrumentoAttributes {
   ID: number;
   Titulo: string;
+  Alcance: string;
   Descripcion: string;
   FechaDeApertura: string;
   FechaDeCierre: string;
@@ -21,7 +21,6 @@ export interface backend_instrumentoAttributes {
   EnlaceDelDetalle: string;
   EnlaceDeLaFoto: string;
   Financiador_id: number;
-  Alcance_id: number;
 }
 
 export type backend_instrumentoPk = "ID";
@@ -32,6 +31,7 @@ export type backend_instrumentoCreationAttributes = Optional<backend_instrumento
 export class backend_instrumento extends Model<backend_instrumentoAttributes, backend_instrumentoCreationAttributes> implements backend_instrumentoAttributes {
   ID!: number;
   Titulo!: string;
+  Alcance!: string;
   Descripcion!: string;
   FechaDeApertura!: string;
   FechaDeCierre!: string;
@@ -46,7 +46,6 @@ export class backend_instrumento extends Model<backend_instrumentoAttributes, ba
   EnlaceDelDetalle!: string;
   EnlaceDeLaFoto!: string;
   Financiador_id!: number;
-  Alcance_id!: number;
 
   // backend_instrumento belongsTo backend_financiador via Financiador_id
   Financiador!: backend_financiador;
@@ -65,11 +64,6 @@ export class backend_instrumento extends Model<backend_instrumentoAttributes, ba
   hasBackend_postulacion!: Sequelize.HasManyHasAssociationMixin<backend_postulacion, backend_postulacionId>;
   hasBackend_postulacions!: Sequelize.HasManyHasAssociationsMixin<backend_postulacion, backend_postulacionId>;
   countBackend_postulacions!: Sequelize.HasManyCountAssociationsMixin;
-  // backend_instrumento belongsTo backend_ubicacion via Alcance_id
-  Alcance!: backend_ubicacion;
-  getAlcance!: Sequelize.BelongsToGetAssociationMixin<backend_ubicacion>;
-  setAlcance!: Sequelize.BelongsToSetAssociationMixin<backend_ubicacion, backend_ubicacionId>;
-  createAlcance!: Sequelize.BelongsToCreateAssociationMixin<backend_ubicacion>;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof backend_instrumento {
     return backend_instrumento.init({
@@ -81,6 +75,10 @@ export class backend_instrumento extends Model<backend_instrumentoAttributes, ba
     },
     Titulo: {
       type: DataTypes.STRING(200),
+      allowNull: false
+    },
+    Alcance: {
+      type: DataTypes.STRING(30),
       allowNull: false
     },
     Descripcion: {
@@ -142,14 +140,6 @@ export class backend_instrumento extends Model<backend_instrumentoAttributes, ba
         model: 'backend_financiador',
         key: 'ID'
       }
-    },
-    Alcance_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'backend_ubicacion',
-        key: 'ID'
-      }
     }
   }, {
     sequelize,
@@ -169,13 +159,6 @@ export class backend_instrumento extends Model<backend_instrumentoAttributes, ba
         using: "BTREE",
         fields: [
           { name: "Financiador_id" },
-        ]
-      },
-      {
-        name: "backend_instrumento_Alcance_id_da2081fb_fk_backend_ubicacion_ID",
-        using: "BTREE",
-        fields: [
-          { name: "Alcance_id" },
         ]
       },
     ]

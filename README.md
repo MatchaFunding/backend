@@ -104,8 +104,7 @@ archivo _package.json_:
 "build:sequalize-ts": "rimraf ./models &&  sequelize-auto -o \"./models\" -d DATABASE -h HOST -u USER -p 3306 -x PASSWORD -e mysql -l ts"
 ```
 
-En donde _HOST_ se remplaza por ```127.0.0.1```, _DATABASE_ se remplaza por MatchaFundingDB
-y las otras credenciales se remplazan por las que estan en Discord.
+En donde las credenciales ```USER``` y ```PASSWORD``` se remplazan por las que estan en Discord.
 
 Finalmente, ejecutar el siguiente comando.
 

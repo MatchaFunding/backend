@@ -17,8 +17,6 @@ import { backend_postulacion as _backend_postulacion } from "./backend_postulaci
 import type { backend_postulacionAttributes, backend_postulacionCreationAttributes } from "./backend_postulacion";
 import { backend_proyecto as _backend_proyecto } from "./backend_proyecto";
 import type { backend_proyectoAttributes, backend_proyectoCreationAttributes } from "./backend_proyecto";
-import { backend_ubicacion as _backend_ubicacion } from "./backend_ubicacion";
-import type { backend_ubicacionAttributes, backend_ubicacionCreationAttributes } from "./backend_ubicacion";
 import { backend_usuario as _backend_usuario } from "./backend_usuario";
 import type { backend_usuarioAttributes, backend_usuarioCreationAttributes } from "./backend_usuario";
 import { django_migrations as _django_migrations } from "./django_migrations";
@@ -34,7 +32,6 @@ export {
   _backend_persona as backend_persona,
   _backend_postulacion as backend_postulacion,
   _backend_proyecto as backend_proyecto,
-  _backend_ubicacion as backend_ubicacion,
   _backend_usuario as backend_usuario,
   _django_migrations as django_migrations,
 };
@@ -58,8 +55,6 @@ export type {
   backend_postulacionCreationAttributes,
   backend_proyectoAttributes,
   backend_proyectoCreationAttributes,
-  backend_ubicacionAttributes,
-  backend_ubicacionCreationAttributes,
   backend_usuarioAttributes,
   backend_usuarioCreationAttributes,
   django_migrationsAttributes,
@@ -76,7 +71,6 @@ export function initModels(sequelize: Sequelize) {
   const backend_persona = _backend_persona.initModel(sequelize);
   const backend_postulacion = _backend_postulacion.initModel(sequelize);
   const backend_proyecto = _backend_proyecto.initModel(sequelize);
-  const backend_ubicacion = _backend_ubicacion.initModel(sequelize);
   const backend_usuario = _backend_usuario.initModel(sequelize);
   const django_migrations = _django_migrations.initModel(sequelize);
 
@@ -104,14 +98,6 @@ export function initModels(sequelize: Sequelize) {
   backend_proyecto.hasMany(backend_colaborador, { as: "backend_colaboradors", foreignKey: "Proyecto_id"});
   backend_postulacion.belongsTo(backend_proyecto, { as: "Proyecto", foreignKey: "Proyecto_id"});
   backend_proyecto.hasMany(backend_postulacion, { as: "backend_postulacions", foreignKey: "Proyecto_id"});
-  backend_beneficiario.belongsTo(backend_ubicacion, { as: "LugarDeCreacion", foreignKey: "LugarDeCreacion_id"});
-  backend_ubicacion.hasMany(backend_beneficiario, { as: "backend_beneficiarios", foreignKey: "LugarDeCreacion_id"});
-  backend_financiador.belongsTo(backend_ubicacion, { as: "LugarDeCreacion", foreignKey: "LugarDeCreacion_id"});
-  backend_ubicacion.hasMany(backend_financiador, { as: "backend_financiadors", foreignKey: "LugarDeCreacion_id"});
-  backend_instrumento.belongsTo(backend_ubicacion, { as: "Alcance", foreignKey: "Alcance_id"});
-  backend_ubicacion.hasMany(backend_instrumento, { as: "backend_instrumentos", foreignKey: "Alcance_id"});
-  backend_proyecto.belongsTo(backend_ubicacion, { as: "Alcance", foreignKey: "Alcance_id"});
-  backend_ubicacion.hasMany(backend_proyecto, { as: "backend_proyectos", foreignKey: "Alcance_id"});
 
   return {
     backend_beneficiario: backend_beneficiario,
@@ -123,7 +109,6 @@ export function initModels(sequelize: Sequelize) {
     backend_persona: backend_persona,
     backend_postulacion: backend_postulacion,
     backend_proyecto: backend_proyecto,
-    backend_ubicacion: backend_ubicacion,
     backend_usuario: backend_usuario,
     django_migrations: django_migrations,
   };

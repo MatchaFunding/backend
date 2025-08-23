@@ -3,7 +3,6 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import type { backend_beneficiario, backend_beneficiarioId } from './backend_beneficiario';
 import type { backend_colaborador, backend_colaboradorId } from './backend_colaborador';
 import type { backend_postulacion, backend_postulacionId } from './backend_postulacion';
-import type { backend_ubicacion, backend_ubicacionId } from './backend_ubicacion';
 
 export interface backend_proyectoAttributes {
   ID: number;
@@ -11,9 +10,9 @@ export interface backend_proyectoAttributes {
   Descripcion: string;
   DuracionEnMesesMinimo: number;
   DuracionEnMesesMaximo: number;
+  Alcance: string;
   Area: string;
   Beneficiario_id: number;
-  Alcance_id: number;
 }
 
 export type backend_proyectoPk = "ID";
@@ -27,9 +26,9 @@ export class backend_proyecto extends Model<backend_proyectoAttributes, backend_
   Descripcion!: string;
   DuracionEnMesesMinimo!: number;
   DuracionEnMesesMaximo!: number;
+  Alcance!: string;
   Area!: string;
   Beneficiario_id!: number;
-  Alcance_id!: number;
 
   // backend_proyecto belongsTo backend_beneficiario via Beneficiario_id
   Beneficiario!: backend_beneficiario;
@@ -60,11 +59,6 @@ export class backend_proyecto extends Model<backend_proyectoAttributes, backend_
   hasBackend_postulacion!: Sequelize.HasManyHasAssociationMixin<backend_postulacion, backend_postulacionId>;
   hasBackend_postulacions!: Sequelize.HasManyHasAssociationsMixin<backend_postulacion, backend_postulacionId>;
   countBackend_postulacions!: Sequelize.HasManyCountAssociationsMixin;
-  // backend_proyecto belongsTo backend_ubicacion via Alcance_id
-  Alcance!: backend_ubicacion;
-  getAlcance!: Sequelize.BelongsToGetAssociationMixin<backend_ubicacion>;
-  setAlcance!: Sequelize.BelongsToSetAssociationMixin<backend_ubicacion, backend_ubicacionId>;
-  createAlcance!: Sequelize.BelongsToCreateAssociationMixin<backend_ubicacion>;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof backend_proyecto {
     return backend_proyecto.init({
@@ -90,6 +84,10 @@ export class backend_proyecto extends Model<backend_proyectoAttributes, backend_
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    Alcance: {
+      type: DataTypes.STRING(30),
+      allowNull: false
+    },
     Area: {
       type: DataTypes.STRING(100),
       allowNull: false
@@ -99,14 +97,6 @@ export class backend_proyecto extends Model<backend_proyectoAttributes, backend_
       allowNull: false,
       references: {
         model: 'backend_beneficiario',
-        key: 'ID'
-      }
-    },
-    Alcance_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'backend_ubicacion',
         key: 'ID'
       }
     }
@@ -128,13 +118,6 @@ export class backend_proyecto extends Model<backend_proyectoAttributes, backend_
         using: "BTREE",
         fields: [
           { name: "Beneficiario_id" },
-        ]
-      },
-      {
-        name: "backend_proyecto_Alcance_id_1a668a88_fk_backend_ubicacion_ID",
-        using: "BTREE",
-        fields: [
-          { name: "Alcance_id" },
         ]
       },
     ]

@@ -4,18 +4,18 @@ import type { backend_consorcio, backend_consorcioId } from './backend_consorcio
 import type { backend_miembro, backend_miembroId } from './backend_miembro';
 import type { backend_postulacion, backend_postulacionId } from './backend_postulacion';
 import type { backend_proyecto, backend_proyectoId } from './backend_proyecto';
-import type { backend_ubicacion, backend_ubicacionId } from './backend_ubicacion';
 
 export interface backend_beneficiarioAttributes {
   ID: number;
   Nombre: string;
   FechaDeCreacion: string;
+  RegionDeCreacion: string;
+  Direccion: string;
   TipoDePersona: string;
   TipoDeEmpresa: string;
   Perfil: string;
   RUTdeEmpresa: string;
   RUTdeRepresentante: string;
-  LugarDeCreacion_id: number;
 }
 
 export type backend_beneficiarioPk = "ID";
@@ -27,12 +27,13 @@ export class backend_beneficiario extends Model<backend_beneficiarioAttributes, 
   ID!: number;
   Nombre!: string;
   FechaDeCreacion!: string;
+  RegionDeCreacion!: string;
+  Direccion!: string;
   TipoDePersona!: string;
   TipoDeEmpresa!: string;
   Perfil!: string;
   RUTdeEmpresa!: string;
   RUTdeRepresentante!: string;
-  LugarDeCreacion_id!: number;
 
   // backend_beneficiario hasMany backend_consorcio via PrimerBeneficiario_id
   backend_consorcios!: backend_consorcio[];
@@ -94,11 +95,6 @@ export class backend_beneficiario extends Model<backend_beneficiarioAttributes, 
   hasBackend_proyecto!: Sequelize.HasManyHasAssociationMixin<backend_proyecto, backend_proyectoId>;
   hasBackend_proyectos!: Sequelize.HasManyHasAssociationsMixin<backend_proyecto, backend_proyectoId>;
   countBackend_proyectos!: Sequelize.HasManyCountAssociationsMixin;
-  // backend_beneficiario belongsTo backend_ubicacion via LugarDeCreacion_id
-  LugarDeCreacion!: backend_ubicacion;
-  getLugarDeCreacion!: Sequelize.BelongsToGetAssociationMixin<backend_ubicacion>;
-  setLugarDeCreacion!: Sequelize.BelongsToSetAssociationMixin<backend_ubicacion, backend_ubicacionId>;
-  createLugarDeCreacion!: Sequelize.BelongsToCreateAssociationMixin<backend_ubicacion>;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof backend_beneficiario {
     return backend_beneficiario.init({
@@ -114,6 +110,14 @@ export class backend_beneficiario extends Model<backend_beneficiarioAttributes, 
     },
     FechaDeCreacion: {
       type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    RegionDeCreacion: {
+      type: DataTypes.STRING(30),
+      allowNull: false
+    },
+    Direccion: {
+      type: DataTypes.STRING(300),
       allowNull: false
     },
     TipoDePersona: {
@@ -135,14 +139,6 @@ export class backend_beneficiario extends Model<backend_beneficiarioAttributes, 
     RUTdeRepresentante: {
       type: DataTypes.STRING(12),
       allowNull: false
-    },
-    LugarDeCreacion_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'backend_ubicacion',
-        key: 'ID'
-      }
     }
   }, {
     sequelize,
@@ -155,13 +151,6 @@ export class backend_beneficiario extends Model<backend_beneficiarioAttributes, 
         using: "BTREE",
         fields: [
           { name: "ID" },
-        ]
-      },
-      {
-        name: "backend_beneficiario_LugarDeCreacion_id_319c7c6a_fk_backend_u",
-        using: "BTREE",
-        fields: [
-          { name: "LugarDeCreacion_id" },
         ]
       },
     ]
