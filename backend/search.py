@@ -5,64 +5,31 @@ from django import forms
 from .serializers import *
 from .models import *
 
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.template import Template, Context
-
-class UbicacionBusqueda(forms.ModelForm):
-    class Meta:
-        model = Ubicacion
-        fields = ('ID', 'Region', 'Capital', 'Calle', 'Numero')
-
-def VerBusquedaUbicacion(request):
-    context = {}
-    result = Ubicacion.objects.all()
-    serializer = UbicacionSerializado(result, many=True)
-    response = Response(serializer.data)
-    if request.method == 'POST':
-        form = UbicacionBusqueda(request.POST)
-        print(f'Resultado de busqueda: {serializer.data}')
-    if request.method == 'GET':
-        form = UbicacionBusqueda()
-        context['region'] = 'Region'
-        context['capital'] = 'Capital'
-        context['calle'] = 'Calle'
-        context['numero'] = 'Numero'
-    return render(request, 'search.html', {'form': form})
-
 class BeneficiarioBusqueda(forms.ModelForm):
     class Meta:
         model = Beneficiario
-        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'RegionDeCreacion', 'Direccion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
-SEARCH_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Búsqueda de Beneficiarios</title>
-</head>
-<body>
-    <form method="post">
-        {% csrf_token %}
-        <input type="text" name="q" placeholder="Nombre del beneficiario" required>
-        <button type="submit">Buscar</button>
-    </form>
-</body>
-</html>
-"""
-@csrf_exempt
 def VerBusquedaBeneficiario(request):
-    if request.method == "GET":
-        tmpl = Template(SEARCH_TEMPLATE)
-        html = tmpl.render(Context({}))
-        return HttpResponse(html)
-    elif request.method == "POST":
-        query = request.POST.get("q", "")
-        if not query:
-            return JsonResponse({"error": "Debe ingresar un término de búsqueda"}, status=400)
-        result = Beneficiario.objects.filter(Nombre__iregex=query) | Beneficiario.objects.filter(Nombre__icontains=query)
-        serializer = BeneficiarioSerializado(result, many=True)
-        return JsonResponse(serializer.data, safe=False)
+    context = {}
+    result = Beneficiario.objects.all()
+    serializer = BeneficiarioSerializado(result, many=True)
+    response = Response(serializer.data)
+    if request.method == 'POST':
+        form = BeneficiarioBusqueda(request.POST)
+        print(f'Resultado de busqueda: {serializer.data}')
+    if request.method == 'GET':
+        form = BeneficiarioBusqueda()
+        context['nombre'] = 'Nombre'
+        context['fechadecreacion'] = 'FechaDeCreacion'
+        context['regiondecreacion'] = 'RegionDeCreacion'
+        context['direccion'] = 'Direccion'
+        context['tipodepersona'] = 'TipoDePersona'
+        context['tipodeempresa'] = 'TipoDeEmpresa'
+        context['perfil'] = 'Perfil'
+        context['rutdeempresa'] = 'RUTdeEmpresa'
+        context['rutderepresentante'] = 'RUTdeRepresentante'
+    return render(request, 'search.html', {'form': form})
 
 class ProyectoBusqueda(forms.ModelForm):
     class Meta:
@@ -189,7 +156,7 @@ def VerBusquedaConsorcio(request):
 class FinanciadorBusqueda(forms.ModelForm):
     class Meta:
         model = Financiador
-        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'RegionDeCreacion', 'Direccion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 def VerBusquedaFinanciador(request):
     context = {}
@@ -203,7 +170,8 @@ def VerBusquedaFinanciador(request):
         form = FinanciadorBusqueda()
         context['nombre'] = 'Nombre'
         context['fechadecreacion'] = 'FechaDeCreacion'
-        context['lugardecreacion'] = 'LugarDeCreacion'
+        context['regiondecreacion'] = 'RegionDeCreacion'
+        context['direccion'] = 'Direccion'
         context['tipodepersona'] = 'TipoDePersona'
         context['tipodeempresa'] = 'TipoDeEmpresa'
         context['perfil'] = 'Perfil'

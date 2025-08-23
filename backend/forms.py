@@ -3,30 +3,10 @@ from django.shortcuts import render
 from django import forms
 from .models import *
 
-class UbicacionForm(forms.ModelForm):
-    class Meta:
-        model = Ubicacion
-        fields = ('ID', 'Region', 'Capital', 'Calle', 'Numero')
-
-def VerFormularioUbicacion(request):
-    context = {}
-    if request.method == 'POST':
-        form = UbicacionForm(request.POST)
-        if form.is_valid():
-            obj = Ubicacion(**form.cleaned_data)
-            obj.save()
-    if request.method == 'GET':
-        form = UbicacionForm()
-        context['region'] = 'Region'
-        context['capital'] = 'Capital'
-        context['calle'] = 'Calle'
-        context['numero'] = 'Numero'
-    return render(request, 'form.html', {'form': form})
-
 class BeneficiarioForm(forms.ModelForm):
     class Meta:
         model = Beneficiario
-        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'RegionDeCreacion', 'Direccion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 def VerFormularioBeneficiario(request):
     context = {}
@@ -39,7 +19,8 @@ def VerFormularioBeneficiario(request):
         form = BeneficiarioForm()
         context['nombre'] = 'Nombre'
         context['fechadecreacion'] = 'FechaDeCreacion'
-        context['lugardecreacion'] = 'LugarDeCreacion'
+        context['regiondecreacion'] = 'RegionDeCreacion'
+        context['direccion'] = 'Direccion'
         context['tipodepersona'] = 'TipoDePersona'
         context['tipodeempresa'] = 'TipoDeEmpresa'
         context['perfil'] = 'Perfil'
@@ -166,7 +147,7 @@ def VerFormularioConsorcio(request):
 class FinanciadorForm(forms.ModelForm):
     class Meta:
         model = Financiador
-        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'RegionDeCreacion', 'Direccion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 def VerFormularioFinanciador(request):
     context = {}
@@ -179,7 +160,8 @@ def VerFormularioFinanciador(request):
         form = FinanciadorForm()
         context['nombre'] = 'Nombre'
         context['fechadecreacion'] = 'FechaDeCreacion'
-        context['lugardecreacion'] = 'LugarDeCreacion'
+        context['regiondecreacion'] = 'RegionDeCreacion'
+        context['direccion'] = 'Direccion'
         context['tipodepersona'] = 'TipoDePersona'
         context['tipodeempresa'] = 'TipoDeEmpresa'
         context['perfil'] = 'Perfil'

@@ -1,52 +1,6 @@
 from django.db import models
 
 '''
-Clase compartida para representar la ubicaion de un objeto.
-'''
-class Ubicacion(models.Model):
-	REGIONES = {
-		"AP": "Región de Arica y Parinacota",
-		"TA": "Región de Tarapacá",
-		"AN": "Región de Antofagasta",
-		"AT": "Región de Atacama",
-		"CO": "Región de Coquimbo",
-		"VA": "Región de Valparaíso",
-		"RM": "Región Metropolitana de Santiago",
-		"LI": "Región del Libertador General Bernardo O'Higgins",
-		"ML": "Región del Maule",
-		"NB": "Región de Ñuble",
-		"BI": "Región del Biobío",
-		"AR": "Región de La Araucanía",
-		"LR": "Región de Los Ríos",
-		"LL": "Región de Los Lagos",
-		"AI": "Región de Aysén del General Carlos Ibáñez del Campo",
-		"MA": "Región de Magallanes y de la Antártica Chilena"
-	}
-	CAPITALES = {
-		"AP": "Arica y Parinacota",
-		"TA": "Iquique",
-		"AN": "Antofagasta ",
-		"AT": "Copiapó",
-		"CO": "La Serena",
-		"VA": "Valparaíso",
-		"RM": "Santiago",
-		"LI": "Rancagua",
-		"ML": "Talca",
-		"NB": "Chillán",
-		"BI": "Concepción",
-		"AR": "Temuco",
-		"LR": "Valdivia",
-		"LL": "Puerto Montt",
-		"AI": "Coyhaique",
-		"MA": "Punta Arena"
-	}
-	ID = models.BigAutoField(primary_key=True)
-	Region = models.CharField(max_length=30, choices=REGIONES)
-	Capital = models.CharField(max_length=30, choices=CAPITALES)
-	Calle = models.CharField(max_length=300)
-	Numero = models.IntegerField()
-
-'''
 Clase que representa la empresa, emprendimiento, grupo de investigacion, etc.
 que desea postular al fondo. La informacion debe regirse por la descripcion
 legal de la empresa.
@@ -57,6 +11,24 @@ https://registros19862.gob.cl/
 https://dequienes.cl/
 '''
 class Beneficiario(models.Model):
+	REGIONES = {
+		"AP": "Arica y Parinacota",
+		"TA": "Tarapacá",
+		"AN": "Antofagasta",
+		"AT": "Atacama",
+		"CO": "Coquimbo",
+		"VA": "Valparaíso",
+		"RM": "de Santiago",
+		"LI": "Libertador General Bernardo O'Higgins",
+		"ML": "Maule",
+		"NB": "Ñuble",
+		"BI": "Biobío",
+		"AR": "La Araucanía",
+		"LR": "Los Ríos",
+		"LL": "Los Lagos",
+		"AI": "Aysén del General Carlos Ibáñez del Campo",
+		"MA": "Magallanes y de la Antártica Chilena"
+	}
 	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
 	PERSONA = {
 		"JU": "Juridica",
@@ -81,7 +53,8 @@ class Beneficiario(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Nombre = models.CharField(max_length=100)
 	FechaDeCreacion = models.DateField()
-	LugarDeCreacion = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
+	RegionDeCreacion = models.CharField(max_length=30, choices=REGIONES)
+	Direccion = models.CharField(max_length=300)
 	TipoDePersona = models.CharField(max_length=30, choices=PERSONA)
 	TipoDeEmpresa = models.CharField(max_length=30, choices=EMPRESA)
 	Perfil = models.CharField(max_length=30, choices=PERFIL)
@@ -93,13 +66,31 @@ Clase que representa los proyectos de una misma empresa.
 https://www.boletaofactura.com/
 '''
 class Proyecto(models.Model):
+	REGIONES = {
+		"AP": "Arica y Parinacota",
+		"TA": "Tarapacá",
+		"AN": "Antofagasta",
+		"AT": "Atacama",
+		"CO": "Coquimbo",
+		"VA": "Valparaíso",
+		"RM": "de Santiago",
+		"LI": "Libertador General Bernardo O'Higgins",
+		"ML": "Maule",
+		"NB": "Ñuble",
+		"BI": "Biobío",
+		"AR": "La Araucanía",
+		"LR": "Los Ríos",
+		"LL": "Los Lagos",
+		"AI": "Aysén del General Carlos Ibáñez del Campo",
+		"MA": "Magallanes y de la Antártica Chilena"
+	}
 	ID = models.BigAutoField(primary_key=True)
 	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
 	Titulo = models.CharField(max_length=300)
 	Descripcion = models.CharField(max_length=500)
 	DuracionEnMesesMinimo = models.IntegerField()
 	DuracionEnMesesMaximo = models.IntegerField()
-	Alcance = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
+	Alcance = models.CharField(max_length=30, choices=REGIONES)
 	Area = models.CharField(max_length=100)
 
 '''
@@ -167,6 +158,24 @@ https://registros19862.gob.cl/
 https://dequienes.cl/
 '''
 class Financiador(models.Model):
+	REGIONES = {
+		"AP": "Arica y Parinacota",
+		"TA": "Tarapacá",
+		"AN": "Antofagasta",
+		"AT": "Atacama",
+		"CO": "Coquimbo",
+		"VA": "Valparaíso",
+		"RM": "de Santiago",
+		"LI": "Libertador General Bernardo O'Higgins",
+		"ML": "Maule",
+		"NB": "Ñuble",
+		"BI": "Biobío",
+		"AR": "La Araucanía",
+		"LR": "Los Ríos",
+		"LL": "Los Lagos",
+		"AI": "Aysén del General Carlos Ibáñez del Campo",
+		"MA": "Magallanes y de la Antártica Chilena"
+	}
 	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
 	PERSONA = {
 		"JU": "Juridica",
@@ -191,7 +200,8 @@ class Financiador(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Nombre = models.CharField(max_length=100)
 	FechaDeCreacion = models.DateField()
-	LugarDeCreacion = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
+	RegionDeCreacion = models.CharField(max_length=30, choices=REGIONES)
+	Direccion = models.CharField(max_length=300)
 	TipoDePersona = models.CharField(max_length=30, choices=PERSONA)
 	TipoDeEmpresa = models.CharField(max_length=30, choices=EMPRESA)
 	Perfil = models.CharField(max_length=30, choices=PERFIL)
@@ -209,6 +219,24 @@ https://github.com/ANID-GITHUB?tab=repositories
 https://datainnovacion.cl/api
 '''
 class Instrumento(models.Model):
+	REGIONES = {
+		"AP": "Arica y Parinacota",
+		"TA": "Tarapacá",
+		"AN": "Antofagasta",
+		"AT": "Atacama",
+		"CO": "Coquimbo",
+		"VA": "Valparaíso",
+		"RM": "de Santiago",
+		"LI": "Libertador General Bernardo O'Higgins",
+		"ML": "Maule",
+		"NB": "Ñuble",
+		"BI": "Biobío",
+		"AR": "La Araucanía",
+		"LR": "Los Ríos",
+		"LL": "Los Lagos",
+		"AI": "Aysén del General Carlos Ibáñez del Campo",
+		"MA": "Magallanes y de la Antártica Chilena"
+	}
 	# https://corfo.cl/sites/cpp/programasyconvocatorias/
 	ESTADO = {
 		"PRX": "Próximo",
@@ -242,7 +270,7 @@ class Instrumento(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Titulo = models.CharField(max_length=200)
 	Financiador = models.ForeignKey(Financiador, on_delete=models.CASCADE)
-	Alcance = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
+	Alcance = models.CharField(max_length=30, choices=REGIONES)
 	Descripcion = models.CharField(max_length=1000)
 	FechaDeApertura = models.DateField()
 	FechaDeCierre = models.DateField()

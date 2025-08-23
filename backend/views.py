@@ -10,34 +10,6 @@ import json
 from django.db.models import *
 
 @api_view(['GET'])
-def VerTodasLasUbicaciones(request):
-    result = Ubicacion.objects.all()
-    serializer = UbicacionSerializado(result, many=True)
-    return Response(serializer.data)
-
-@api_view(['POST'])
-def CrearUbicacion(request):
-    if request.method == 'POST':
-        serializer = UbicacionSerializado(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['PUT'])
-def CambiarUbicacion(request, pk=None):
-    try:
-        instance = Ubicacion.objects.get(pk=pk)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = UbicacionSerializado(instance, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET'])
 def VerTodosLosBeneficiarios(request):
     result = Beneficiario.objects.all()
     serializer = BeneficiarioSerializado(result, many=True)

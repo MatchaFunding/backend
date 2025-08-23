@@ -1,15 +1,10 @@
 from rest_framework import serializers
 from .models import *
 
-class UbicacionSerializado(serializers.ModelSerializer):
-    class Meta:
-        model = Ubicacion
-        fields = ('ID', 'Region', 'Capital', 'Calle', 'Numero')
-
 class BeneficiarioSerializado(serializers.ModelSerializer):
     class Meta:
         model = Beneficiario
-        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'RegionDeCreacion', 'Direccion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 class ProyectoSerializado(serializers.ModelSerializer):
     class Meta:
@@ -44,7 +39,7 @@ class ConsorcioSerializado(serializers.ModelSerializer):
 class FinanciadorSerializado(serializers.ModelSerializer):
     class Meta:
         model = Financiador
-        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'LugarDeCreacion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
+        fields = ('ID', 'Nombre', 'FechaDeCreacion', 'RegionDeCreacion', 'Direccion', 'TipoDePersona', 'TipoDeEmpresa', 'Perfil', 'RUTdeEmpresa', 'RUTdeRepresentante')
 
 class InstrumentoSerializado(serializers.ModelSerializer):
     class Meta:
