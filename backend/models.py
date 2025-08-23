@@ -18,16 +18,16 @@ class Beneficiario(models.Model):
 		"AT": "Atacama",
 		"CO": "Coquimbo",
 		"VA": "Valparaíso",
-		"RM": "de Santiago",
-		"LI": "Libertador General Bernardo O'Higgins",
+		"RM": "Santiago",
+		"LI": "O'Higgins",
 		"ML": "Maule",
 		"NB": "Ñuble",
 		"BI": "Biobío",
 		"AR": "La Araucanía",
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
-		"AI": "Aysén del General Carlos Ibáñez del Campo",
-		"MA": "Magallanes y de la Antártica Chilena"
+		"AI": "Aysén",
+		"MA": "Magallanes"
 	}
 	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
 	PERSONA = {
@@ -73,16 +73,16 @@ class Proyecto(models.Model):
 		"AT": "Atacama",
 		"CO": "Coquimbo",
 		"VA": "Valparaíso",
-		"RM": "de Santiago",
-		"LI": "Libertador General Bernardo O'Higgins",
+		"RM": "Santiago",
+		"LI": "O'Higgins",
 		"ML": "Maule",
 		"NB": "Ñuble",
 		"BI": "Biobío",
 		"AR": "La Araucanía",
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
-		"AI": "Aysén del General Carlos Ibáñez del Campo",
-		"MA": "Magallanes y de la Antártica Chilena"
+		"AI": "Aysén",
+		"MA": "Magallanes"
 	}
 	ID = models.BigAutoField(primary_key=True)
 	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
@@ -165,16 +165,16 @@ class Financiador(models.Model):
 		"AT": "Atacama",
 		"CO": "Coquimbo",
 		"VA": "Valparaíso",
-		"RM": "de Santiago",
-		"LI": "Libertador General Bernardo O'Higgins",
+		"RM": "Santiago",
+		"LI": "O'Higgins",
 		"ML": "Maule",
 		"NB": "Ñuble",
 		"BI": "Biobío",
 		"AR": "La Araucanía",
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
-		"AI": "Aysén del General Carlos Ibáñez del Campo",
-		"MA": "Magallanes y de la Antártica Chilena"
+		"AI": "Aysén",
+		"MA": "Magallanes"
 	}
 	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
 	PERSONA = {
@@ -226,16 +226,16 @@ class Instrumento(models.Model):
 		"AT": "Atacama",
 		"CO": "Coquimbo",
 		"VA": "Valparaíso",
-		"RM": "de Santiago",
-		"LI": "Libertador General Bernardo O'Higgins",
+		"RM": "Santiago",
+		"LI": "O'Higgins",
 		"ML": "Maule",
 		"NB": "Ñuble",
 		"BI": "Biobío",
 		"AR": "La Araucanía",
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
-		"AI": "Aysén del General Carlos Ibáñez del Campo",
-		"MA": "Magallanes y de la Antártica Chilena"
+		"AI": "Aysén",
+		"MA": "Magallanes"
 	}
 	# https://corfo.cl/sites/cpp/programasyconvocatorias/
 	ESTADO = {
