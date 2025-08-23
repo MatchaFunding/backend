@@ -16,13 +16,13 @@ sys.path.append(project_root)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from backend.models import Beneficiario, Proyecto, Ubicacion
+from backend.models import Beneficiario, Proyecto
 # --------------------------------------------------
 
 # Configuración de Ollama
 API = "http://localhost:11434/api/generate"
-#MODEL = "llama3.2:latest"
-MODEL = "gemma3:latest"
+MODEL = "llama3.2:latest"
+#MODEL = "gemma3:latest"
 
 DIR_SUCIO = os.path.join(script_dir, 'datos', 'sucios', 'csvs', 'boletaofactura_resultados.csv')
 
@@ -70,36 +70,6 @@ def extraer_json_puro(texto):
     if not match:
         match = re.search(r"(\{.*\})", texto, re.DOTALL)
     return match.group(1) if match else None
-
-def obtener_ubicacion_rm():
-    """Obtiene o crea la ubicación de la Región Metropolitana"""
-    try:
-        # Buscar por Region="RM" en lugar de codigo="RM"
-        lugar_rm = Ubicacion.objects.get(Region="RM")
-        print("Ubicación RM encontrada")
-    except Ubicacion.DoesNotExist:
-        print("Creando ubicación RM por defecto...")
-        # Crear la ubicación de la Región Metropolitana
-        lugar_rm = Ubicacion(
-            Region="RM",
-            Capital="Santiago",
-            Calle="Av. Libertador Bernardo O'Higgins",
-            Numero=123
-        )
-        lugar_rm.save()
-        print("Ubicación RM creada")
-    except Exception as e:
-        print(f"Error obteniendo ubicación RM: {e}")
-        # Crear una ubicación por defecto en caso de error
-        lugar_rm = Ubicacion(
-            Region="RM",
-            Capital="Santiago",
-            Calle="Por defecto",
-            Numero=123
-        )
-        lugar_rm.save()
-    
-    return lugar_rm
 
 def procesar_fila(row):
     # Crear el texto a analizar combinando las columnas relevantes
@@ -169,9 +139,6 @@ def procesar_fila(row):
         print(f"Texto JSON: {json_text}")
         return None, []
 
-    # Obtener ubicación RM
-    lugar_rm = obtener_ubicacion_rm()
-
     # Crear beneficiario
     b_data = data.get("beneficiario", {})
     tipo_persona, tipo_empresa, perfil = mapear_choices(
@@ -196,7 +163,8 @@ def procesar_fila(row):
     beneficiario = Beneficiario(
         Nombre=b_data.get("Nombre", row.get('RazonSocial', '')[:100]),
         FechaDeCreacion=fecha_creacion,  # Fecha fija
-        LugarDeCreacion=lugar_rm,
+        RegionDeCreacion="RM",
+        Direccion="N/A",
         TipoDePersona=tipo_persona,
         TipoDeEmpresa=tipo_empresa,
         Perfil=perfil,
@@ -234,7 +202,7 @@ def procesar_fila(row):
             Descripcion=p.get("Descripcion", "Sin descripción")[:500],
             DuracionEnMesesMinimo=6,
             DuracionEnMesesMaximo=12,
-            Alcance=lugar_rm,
+            Alcance="RM",
             Area=p.get("Area", "Investigación")[:100]
         )
         try:
