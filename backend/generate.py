@@ -28,9 +28,9 @@ SEARCH_HTML = """<form method="post">
 <input type="submit" value="Submit">
 </form>"""
 
+# Parsea models.py y devuelve una lista de clases modelo con sus campos, 
+# omitiendo diccionarios definidos dentro de la clase
 def parse_models(file_path):
-    """Parsea models.py y devuelve una lista de clases modelo con sus campos, 
-    omitiendo diccionarios definidos dentro de la clase"""
     with open(file_path, "r", encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=file_path)
 
@@ -50,10 +50,9 @@ def parse_models(file_path):
                     models.append((node.name, fields))
     return models
 
-
+# Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
+# omitiendo diccionarios definidos dentro de la clase
 def parse_models_with_value(file_path):
-    """Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
-    omitiendo diccionarios definidos dentro de la clase"""
     with open(file_path, "r", encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=file_path)
 
@@ -77,7 +76,7 @@ def parse_models_with_value(file_path):
                     models.append((node.name, fields))
     return models
 
-
+# Genera los serializadores por modelo para pasarlos en formato JSON
 def generate_serializers(models):
     lines = [
         "from rest_framework import serializers",
@@ -92,7 +91,7 @@ def generate_serializers(models):
         lines.append(f"")
     return "\n".join(lines)
 
-
+# Genera las vistas para leer, crear y modificar objetos del modelo
 def generate_views(models):
     lines = [
         "from django.http import JsonResponse",
@@ -159,7 +158,7 @@ def generate_views(models):
 
     return "\n".join(lines)
 
-
+# Genera el archivo admin para habilitar el acceso a los modelos
 def generate_admin(models):
     lines = [
         "from django.contrib import admin",
@@ -170,7 +169,9 @@ def generate_admin(models):
         lines.append(f"admin.site.register({model})")
     return "\n".join(lines)
 
-
+# Genera formularios para crear objetos nuevos en base a los modelos
+# Si existe una llave foranea, el formulario deja elegir el objeto en
+# base a su nombre
 def generate_forms(models):
     forms_code = [
         "from django.http import HttpResponseRedirect",
@@ -208,6 +209,7 @@ def generate_forms(models):
         f.write("\n".join(forms_code))
 
 
+# Genera APIs para buscar los modelos en base a campos de texto
 def generate_search(models):
     forms_code = [
         "from rest_framework.response import Response",
@@ -291,7 +293,7 @@ def generate_search(models):
     with open(SEARCH_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
 
-
+# Genera los endpoint para las APIs
 def generate_urls(models):
     lines = [
         "from django.contrib import admin",
