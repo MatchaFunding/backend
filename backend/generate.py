@@ -160,51 +160,6 @@ def generate_views(models):
     return "\n".join(lines)
 
 
-def generate_urls(models):
-    lines = [
-        "from django.contrib import admin",
-        "from django.urls import path",
-        "from . import views",
-        "from . import forms",
-        "from . import search",
-        "",
-        "urlpatterns = [",
-        "    path('admin/', admin.site.urls),",
-    ]
-    for model, _ in models:
-        modelplural = str(model)
-        todes = ""
-        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
-            todes = "TodasLas"
-        else:
-            todes = "TodosLos"
-        if modelplural[-1] in VOCALES:
-            modelplural += "s"
-        else:
-            modelplural += "es"
-        lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
-        
-    for model, _ in models:
-        lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
-        
-    for model, _ in models:
-        lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
-        
-    for model, _ in models:
-        lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
-    
-    for model, fields in models:
-        if "RUT" in fields:
-            lines.append(f"    path('buscar{model.lower()}porrut/', search.Buscar{model}PorRUT),")
-        if "Nombre" in fields:
-            lines.append(f"    path('buscar{model.lower()}pornombre/', search.Buscar{model}PorNombre),")
-        elif "Titulo" in fields:
-            lines.append(f"    path('buscar{model.lower()}portitulo/', search.Buscar{model}PorTitulo),")
-    
-    lines.append("]")
-    return "\n".join(lines)
-
-
 def generate_admin(models):
     lines = [
         "from django.contrib import admin",
@@ -335,6 +290,51 @@ def generate_search(models):
 
     with open(SEARCH_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
+
+
+def generate_urls(models):
+    lines = [
+        "from django.contrib import admin",
+        "from django.urls import path",
+        "from . import views",
+        "from . import forms",
+        "from . import search",
+        "",
+        "urlpatterns = [",
+        "    path('admin/', admin.site.urls),",
+    ]
+    for model, _ in models:
+        modelplural = str(model)
+        todes = ""
+        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
+            todes = "TodasLas"
+        else:
+            todes = "TodosLos"
+        if modelplural[-1] in VOCALES:
+            modelplural += "s"
+        else:
+            modelplural += "es"
+        lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
+    
+    for model, fields in models:
+        if "RUT" in fields:
+            lines.append(f"    path('buscar{model.lower()}porrut/', search.Buscar{model}PorRUT),")
+        if "Nombre" in fields:
+            lines.append(f"    path('buscar{model.lower()}pornombre/', search.Buscar{model}PorNombre),")
+        elif "Titulo" in fields:
+            lines.append(f"    path('buscar{model.lower()}portitulo/', search.Buscar{model}PorTitulo),")
+    
+    lines.append("]")
+    return "\n".join(lines)
 
 
 def main():
