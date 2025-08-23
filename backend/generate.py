@@ -193,8 +193,13 @@ def generate_urls(models):
     for model, _ in models:
         lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
     
-    for model, _ in models:
-        lines.append(f"    path('busqueda{model.lower()}/', search.VerBusqueda{model}),")
+    for model, fields in models:
+        if "RUT" in fields:
+            lines.append(f"    path('buscar{model.lower()}porrut/', search.Buscar{model}PorRUT),")
+        if "Nombre" in fields:
+            lines.append(f"    path('buscar{model.lower()}pornombre/', search.Buscar{model}PorNombre),")
+        elif "Titulo" in fields:
+            lines.append(f"    path('buscar{model.lower()}portitulo/', search.Buscar{model}PorTitulo),")
     
     lines.append("]")
     return "\n".join(lines)
@@ -251,58 +256,80 @@ def generate_forms(models):
 def generate_search(models):
     forms_code = [
         "from rest_framework.response import Response",
-        "from django.http import HttpResponseRedirect",
+        "from django.http import JsonResponse, HttpResponse, HttpResponseRedirect",
+        "from django.views.decorators.csrf import csrf_exempt",
+        "from django.template import Template, Context",
         "from django.shortcuts import render",
         "from django import forms",
         "from .serializers import *",
-        "from .models import *",
-        "",
+        "from .models import *"
+        "\n",
+        "SEARCH_TEMPLATE = '''",
+        "<!DOCTYPE html>",
+        "<html>",
+        "<head>",
+        "    <title>Busqueda por texto</title>",
+        "</head>",
+        "<body>",
+        "    <form method=\"post\">",
+        "        {% csrf_token %}",
+        "        <input type=\"text\" name=\"q\" required>",
+        "        <button type=\"submit\">Buscar</button>",
+        "    </form>",
+        "</body>",
+        "</html>",
+        "'''",
+        ""
     ]
     for model, fields in models:
-        formfields = tuple(fields)
-        forms_code.append(f"class {model}Busqueda(forms.ModelForm):")
-        forms_code.append(f"    class Meta:")
-        forms_code.append(f"        model = {model}")
-        forms_code.append(f"        fields = {formfields}")
-        forms_code.append("")
-        forms_code.append(f"def VerBusqueda{model}(request):")
-        forms_code.append("    context = {}")
-        forms_code.append(f"    result = {model}.objects.all()")
-        forms_code.append(f"    serializer = {model}Serializado(result, many=True)")
-        forms_code.append(f"    response = Response(serializer.data)")
-        forms_code.append(f"    if request.method == 'POST':")
-        forms_code.append(f"        form = {model}Busqueda(request.POST)")
-        forms_code.append("        print(f'Resultado de busqueda: {serializer.data}')")
-        forms_code.append(f"    if request.method == 'GET':")
-        forms_code.append(f"        form = {model}Busqueda()")
-        for field in formfields:
-            if field != "ID":
-                forms_code.append(f"        context['{field.lower()}'] = '{field}'")
-        forms_code.append(f"    return render(request, 'search.html', {{'form': form}})")
-        forms_code.append("")
-    '''
-    for model, fields in models:
-        formfields = tuple(fields)
-        forms_code.append(f"class {model}Busqueda(forms.ModelForm):")
-        forms_code.append(f"    class Meta:")
-        forms_code.append(f"        model = {model}")
-        forms_code.append(f"        fields = {formfields}")
-        forms_code.append("")
-        forms_code.append(f"def VerBusqueda{model}(request):")
-        forms_code.append("    context = {}")
-        forms_code.append(f"    objects = {model}.objects.all()")
-        forms_code.append(f"    context['objects'] = objects")
-        forms_code.append("    print('Objetos: {objects}')")
-        forms_code.append(f"    if request.method == 'POST':")
-        forms_code.append(f"        form = {model}Busqueda(request.POST)")
-        forms_code.append(f"    if request.method == 'GET':")
-        forms_code.append(f"        form = {model}Busqueda()")
-        for field in formfields:
-            if field != "ID":
-                forms_code.append(f"        context['{field.lower()}'] = '{field}'")
-        forms_code.append(f"    return render(request, 'search.html', {{'form': form, 'objects': objects}})")
-        forms_code.append("")
-    '''
+        if "RUT" in fields:
+            forms_code.append(f"@csrf_exempt")
+            forms_code.append(f"def Buscar{model}PorRUT(request):")
+            forms_code.append(f"    if request.method == \"GET\":")
+            forms_code.append(f"        tmpl = Template(SEARCH_TEMPLATE)")
+            forms_code.append("        html = tmpl.render(Context({}))")
+            forms_code.append(f"        return HttpResponse(html)")
+            forms_code.append(f"    elif request.method == \"POST\":")
+            forms_code.append(f"        query = request.POST.get(\"q\", "")")
+            forms_code.append(f"        if not query:")
+            forms_code.append("            return JsonResponse({\"error\": \"Debe ingresar un término de búsqueda\"}, status=400)")
+            forms_code.append(f"        result = {model}.objects.filter(RUT__iregex=query) | {model}.objects.filter(RUT__icontains=query)")
+            forms_code.append(f"        serializer = {model}Serializado(result, many=True)")
+            forms_code.append(f"        return JsonResponse(serializer.data, safe=False)")
+            forms_code.append("")
+
+        if "Nombre" in fields:
+            forms_code.append(f"@csrf_exempt")
+            forms_code.append(f"def Buscar{model}PorNombre(request):")
+            forms_code.append(f"    if request.method == \"GET\":")
+            forms_code.append(f"        tmpl = Template(SEARCH_TEMPLATE)")
+            forms_code.append("        html = tmpl.render(Context({}))")
+            forms_code.append(f"        return HttpResponse(html)")
+            forms_code.append(f"    elif request.method == \"POST\":")
+            forms_code.append(f"        query = request.POST.get(\"q\", "")")
+            forms_code.append(f"        if not query:")
+            forms_code.append("            return JsonResponse({\"error\": \"Debe ingresar un término de búsqueda\"}, status=400)")
+            forms_code.append(f"        result = {model}.objects.filter(Nombre__iregex=query) | {model}.objects.filter(Nombre__icontains=query)")
+            forms_code.append(f"        serializer = {model}Serializado(result, many=True)")
+            forms_code.append(f"        return JsonResponse(serializer.data, safe=False)")
+            forms_code.append("")
+
+        elif "Titulo" in fields:
+            forms_code.append(f"@csrf_exempt")
+            forms_code.append(f"def Buscar{model}PorTitulo(request):")
+            forms_code.append(f"    if request.method == \"GET\":")
+            forms_code.append(f"        tmpl = Template(SEARCH_TEMPLATE)")
+            forms_code.append("        html = tmpl.render(Context({}))")
+            forms_code.append(f"        return HttpResponse(html)")
+            forms_code.append(f"    elif request.method == \"POST\":")
+            forms_code.append(f"        query = request.POST.get(\"q\", "")")
+            forms_code.append(f"        if not query:")
+            forms_code.append("            return JsonResponse({\"error\": \"Debe ingresar un término de búsqueda\"}, status=400)")
+            forms_code.append(f"        result = {model}.objects.filter(Titulo__iregex=query) | {model}.objects.filter(Titulo__icontains=query)")
+            forms_code.append(f"        serializer = {model}Serializado(result, many=True)")
+            forms_code.append(f"        return JsonResponse(serializer.data, safe=False)")
+            forms_code.append("")
+
     with open(os.path.join("..", TEMP_DIR, f"search.html"), "w", encoding="utf-8") as f:
         f.write(SEARCH_HTML)
 
