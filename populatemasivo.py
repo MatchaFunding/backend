@@ -11,7 +11,7 @@ from django.db import transaction
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from databases.backend.models import Beneficiario, Proyecto, Ubicacion
+from backend.models import Beneficiario, Proyecto, Ubicacion
 
 # Configuración del modelo IA local
 API = "http://localhost:11434/api/generate"
