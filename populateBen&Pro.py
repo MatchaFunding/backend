@@ -21,8 +21,8 @@ from backend.models import Beneficiario, Proyecto
 
 # Configuración de Ollama
 API = "http://localhost:11434/api/generate"
-MODEL = "llama3.2:latest"
-#MODEL = "gemma3:latest"
+#MODEL = "llama3.2:latest"
+MODEL = "gemma3:latest"
 
 DIR_SUCIO = os.path.join(script_dir, 'datos', 'sucios', 'csvs', 'boletaofactura_resultados.csv')
 

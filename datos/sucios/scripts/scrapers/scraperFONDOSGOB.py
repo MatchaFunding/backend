@@ -155,7 +155,6 @@ def buscar_en_fondosgob():
 
     # Normalizar fechas
     fecha_cols = [
-        "fecha_inicio", "fecha_fin",
         "postulacion_inicio", "postulacion_cierre",
         "resultados", "firma_convenios"
     ]
