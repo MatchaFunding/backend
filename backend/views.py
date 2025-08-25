@@ -37,6 +37,12 @@ def CambiarBeneficiario(request, pk=None):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def BorrarBeneficiario(request, pk=None):
+    member = Beneficiario.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def VerTodosLosProyectos(request):
     result = Proyecto.objects.all()
@@ -64,6 +70,12 @@ def CambiarProyecto(request, pk=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def BorrarProyecto(request, pk=None):
+    member = Proyecto.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def VerTodasLasPersonas(request):
@@ -93,6 +105,12 @@ def CambiarPersona(request, pk=None):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def BorrarPersona(request, pk=None):
+    member = Persona.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def VerTodosLosMiembros(request):
     result = Miembro.objects.all()
@@ -120,6 +138,12 @@ def CambiarMiembro(request, pk=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def BorrarMiembro(request, pk=None):
+    member = Miembro.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def VerTodosLosColaboradores(request):
@@ -149,6 +173,12 @@ def CambiarColaborador(request, pk=None):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def BorrarColaborador(request, pk=None):
+    member = Colaborador.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def VerTodosLosUsuarios(request):
     result = Usuario.objects.all()
@@ -176,6 +206,12 @@ def CambiarUsuario(request, pk=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def BorrarUsuario(request, pk=None):
+    member = Usuario.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def VerTodosLosConsorcios(request):
@@ -205,6 +241,12 @@ def CambiarConsorcio(request, pk=None):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def BorrarConsorcio(request, pk=None):
+    member = Consorcio.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def VerTodosLosFinanciadores(request):
     result = Financiador.objects.all()
@@ -232,6 +274,12 @@ def CambiarFinanciador(request, pk=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def BorrarFinanciador(request, pk=None):
+    member = Financiador.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def VerTodosLosInstrumentos(request):
@@ -261,6 +309,12 @@ def CambiarInstrumento(request, pk=None):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def BorrarInstrumento(request, pk=None):
+    member = Instrumento.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def VerTodasLasPostulaciones(request):
     result = Postulacion.objects.all()
@@ -288,3 +342,9 @@ def CambiarPostulacion(request, pk=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def BorrarPostulacion(request, pk=None):
+    member = Postulacion.objects.get(pk=pk)
+    member.delete()
+    return Response(status=status.HTTP_200_OK)

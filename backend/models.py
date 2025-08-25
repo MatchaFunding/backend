@@ -62,6 +62,9 @@ class Beneficiario(models.Model):
 	RUTdeEmpresa = models.CharField(max_length=12)
 	RUTdeRepresentante = models.CharField(max_length=12)
 
+	def __str__(self):
+		return f'{self.Nombre}'
+
 '''
 Clase que representa los proyectos de una misma empresa.
 https://www.boletaofactura.com/
@@ -94,6 +97,9 @@ class Proyecto(models.Model):
 	DuracionEnMesesMaximo = models.IntegerField()
 	Alcance = models.CharField(max_length=30, choices=REGIONES)
 	Area = models.CharField(max_length=100)
+	
+	def __str__(self):
+		return f'{self.Titulo}'
 
 '''
 Clase que representa a una persona natural, la cual puede ser miembro de una empresa o proyecto.
@@ -112,6 +118,9 @@ class Persona(models.Model):
 	Nombre = models.CharField(max_length=200)
 	Sexo = models.CharField(max_length=30, choices=SEXO)
 	RUT = models.CharField(max_length=12)
+	
+	def __str__(self):
+		return f'{self.Nombre}'
 
 '''
 Clase que representa a una persona que es parte de una empresa, agrupacion o grupo de investigacion.
@@ -121,6 +130,11 @@ class Miembro(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
 	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
+	
+	def __str__(self):
+		persona = Persona.objects.filter(ID=self.Persona).first()
+		beneficiario = Beneficiario.objects.filter(ID=self.Beneficiario).first()
+		return f"'{persona}' es miembro de '{beneficiario}'"
 
 '''
 Clase que representa a una persona que es parte de un proyecto que busca fondos.
@@ -131,6 +145,11 @@ class Colaborador(models.Model):
 	Persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
 	Proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
 
+	def __str__(self):
+		persona = Persona.objects.filter(ID=self.Persona).first()
+		proyecto = Proyecto.objects.filter(ID=self.Proyecto).first()
+		return f"'{persona}' trabajó en '{proyecto}'"
+
 '''
 Clase que representa a un usuario de matchafunding.
 '''
@@ -140,6 +159,10 @@ class Usuario(models.Model):
 	NombreDeUsuario = models.CharField(max_length=200, null=False)
 	Contrasena = models.CharField(max_length=200, null=False)
 	Correo = models.EmailField(max_length=200, null=False)
+	
+	def __str__(self):
+		persona = Persona.objects.filter(ID=self.Persona).first()
+		return f"{persona}"
 
 '''
 Agrupacion de multiples empresas y agrupaciones que pretenden postular
@@ -149,6 +172,11 @@ class Consorcio(models.Model):
 	ID = models.BigAutoField(primary_key=True)
 	PrimerBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='primero')
 	SegundoBeneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='segundo')
+
+	def __str__(self):
+		primero = Beneficiario.objects.filter(ID=self.PrimerBeneficiario).first()
+		segundo = Beneficiario.objects.filter(ID=self.SegundoBeneficiario).first()
+		return f"'{primero}' trabajó con '{segundo}'"
 
 '''
 Clase que representa las entes financieras que ofrecen los fondos.
@@ -210,6 +238,9 @@ class Financiador(models.Model):
 	Perfil = models.CharField(max_length=30, choices=PERFIL)
 	RUTdeEmpresa = models.CharField(max_length=12)
 	RUTdeRepresentante = models.CharField(max_length=12)
+
+	def __str__(self):
+		return f'{self.Nombre}'
 
 '''
 Clase que representa los fondos concursables a los que los proyectos pueden postular.
@@ -289,6 +320,9 @@ class Instrumento(models.Model):
 	EnlaceDelDetalle = models.URLField(max_length=300)
 	EnlaceDeLaFoto = models.URLField(max_length=300)
 
+	def __str__(self):
+		return f'{self.Titulo}'
+
 '''
 Clase que representa las postulaciones de un proyecto a un fondo
 https://registros19862.gob.cl/
@@ -308,3 +342,9 @@ class Postulacion(models.Model):
 	FechaDePostulacion = models.DateField()
 	FechaDeResultado = models.DateField()
 	Detalle = models.CharField(max_length=1000)
+	
+	def __str__(self):
+		beneficiario = Beneficiario.objects.filter(ID=self.Beneficiario).first()
+		proyecto = Proyecto.objects.filter(ID=self.Proyecto).first()
+		instrumento = Instrumento.objects.filter(ID=self.Instrumento).first()
+		return f"'{beneficiario}' postuloó con el proyecto '{proyecto}' al fondo '{instrumento}'"

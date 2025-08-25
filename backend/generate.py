@@ -1,6 +1,5 @@
 import ast
 import os
-import re
 
 SERIAL_FILE = "serializers.py"
 MODELS_FILE = "models.py"
@@ -28,9 +27,9 @@ SEARCH_HTML = """<form method="post">
 <input type="submit" value="Submit">
 </form>"""
 
+# Parsea models.py y devuelve una lista de clases modelo con sus campos, 
+# omitiendo diccionarios definidos dentro de la clase
 def parse_models(file_path):
-    """Parsea models.py y devuelve una lista de clases modelo con sus campos, 
-    omitiendo diccionarios definidos dentro de la clase"""
     with open(file_path, "r", encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=file_path)
 
@@ -50,10 +49,9 @@ def parse_models(file_path):
                     models.append((node.name, fields))
     return models
 
-
+# Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
+# omitiendo diccionarios definidos dentro de la clase
 def parse_models_with_value(file_path):
-    """Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
-    omitiendo diccionarios definidos dentro de la clase"""
     with open(file_path, "r", encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=file_path)
 
@@ -77,7 +75,7 @@ def parse_models_with_value(file_path):
                     models.append((node.name, fields))
     return models
 
-
+# Genera los serializadores por modelo para pasarlos en formato JSON
 def generate_serializers(models):
     lines = [
         "from rest_framework import serializers",
@@ -92,7 +90,7 @@ def generate_serializers(models):
         lines.append(f"")
     return "\n".join(lines)
 
-
+# Genera las vistas para leer, crear y modificar objetos del modelo
 def generate_views(models):
     lines = [
         "from django.http import JsonResponse",
@@ -112,26 +110,23 @@ def generate_views(models):
         serializer = f"{model}Serializado"
         modelplural = str(model)
         todes = ""
-
+        # Determina si un modelo es femenino o masculino en plural
         if modelplural[-1] == "a" or modelplural[-4:] == "cion":
             todes = "TodasLas"
         else:
             todes = "TodosLos"
-        
         if modelplural[-1] in VOCALES:
             modelplural += "s"
         else:
             modelplural += "es"
-        
-        # GET
+        # Ver
         lines.append(f"@api_view(['GET'])")
         lines.append(f"def Ver{todes}{modelplural}(request):")
         lines.append(f"    result = {model}.objects.all()")
         lines.append(f"    serializer = {serializer}(result, many=True)")
         lines.append(f"    return Response(serializer.data)")
         lines.append(f"")
-        
-        # POST
+        # Crear
         lines.append(f"@api_view(['POST'])")
         lines.append(f"def Crear{model}(request):")
         lines.append(f"    if request.method == 'POST':")
@@ -141,8 +136,7 @@ def generate_views(models):
         lines.append(f"            return Response(serializer.data, status=status.HTTP_201_CREATED)")
         lines.append(f"    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)")
         lines.append(f"")
-
-        # PUT
+        # Modificar
         lines.append(f"@api_view(['PUT'])")
         lines.append(f"def Cambiar{model}(request, pk=None):")
         lines.append(f"    try:")
@@ -156,55 +150,17 @@ def generate_views(models):
         lines.append(f"        return Response(serializer.data)")
         lines.append(f"    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)")
         lines.append(f"")
+        # Borrar
+        lines.append(f"@api_view(['POST'])")
+        lines.append(f"def Borrar{model}(request, pk=None):")
+        lines.append(f"    member = {model}.objects.get(pk=pk)")
+        lines.append(f"    member.delete()")
+        lines.append(f"    return Response(status=status.HTTP_200_OK)")
+        lines.append(f"")
 
     return "\n".join(lines)
 
-
-def generate_urls(models):
-    lines = [
-        "from django.contrib import admin",
-        "from django.urls import path",
-        "from . import views",
-        "from . import forms",
-        "from . import search",
-        "",
-        "urlpatterns = [",
-        "    path('admin/', admin.site.urls),",
-    ]
-    for model, _ in models:
-        modelplural = str(model)
-        todes = ""
-        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
-            todes = "TodasLas"
-        else:
-            todes = "TodosLos"
-        if modelplural[-1] in VOCALES:
-            modelplural += "s"
-        else:
-            modelplural += "es"
-        lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
-        
-    for model, _ in models:
-        lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
-        
-    for model, _ in models:
-        lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
-        
-    for model, _ in models:
-        lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
-    
-    for model, fields in models:
-        if "RUT" in fields:
-            lines.append(f"    path('buscar{model.lower()}porrut/', search.Buscar{model}PorRUT),")
-        if "Nombre" in fields:
-            lines.append(f"    path('buscar{model.lower()}pornombre/', search.Buscar{model}PorNombre),")
-        elif "Titulo" in fields:
-            lines.append(f"    path('buscar{model.lower()}portitulo/', search.Buscar{model}PorTitulo),")
-    
-    lines.append("]")
-    return "\n".join(lines)
-
-
+# Genera el archivo admin para habilitar el acceso a los modelos
 def generate_admin(models):
     lines = [
         "from django.contrib import admin",
@@ -215,7 +171,9 @@ def generate_admin(models):
         lines.append(f"admin.site.register({model})")
     return "\n".join(lines)
 
-
+# Genera formularios para crear objetos nuevos en base a los modelos
+# Si existe una llave foranea, el formulario deja elegir el objeto en
+# base a su nombre
 def generate_forms(models):
     forms_code = [
         "from django.http import HttpResponseRedirect",
@@ -252,7 +210,7 @@ def generate_forms(models):
     with open(FORMS_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
 
-
+# Genera APIs para buscar los modelos en base a campos de texto
 def generate_search(models):
     forms_code = [
         "from rest_framework.response import Response",
@@ -282,9 +240,9 @@ def generate_search(models):
         ""
     ]
     for model, fields in models:
-        if "RUT" in fields:
+        if "RUT" in fields or "Nombre" in fields or "Titulo" in fields:
             forms_code.append(f"@csrf_exempt")
-            forms_code.append(f"def Buscar{model}PorRUT(request):")
+            forms_code.append(f"def Buscar{model}(request):")
             forms_code.append(f"    if request.method == \"GET\":")
             forms_code.append(f"        tmpl = Template(SEARCH_TEMPLATE)")
             forms_code.append("        html = tmpl.render(Context({}))")
@@ -293,39 +251,15 @@ def generate_search(models):
             forms_code.append(f"        query = request.POST.get(\"q\", "")")
             forms_code.append(f"        if not query:")
             forms_code.append("            return JsonResponse({\"error\": \"Debe ingresar un término de búsqueda\"}, status=400)")
-            forms_code.append(f"        result = {model}.objects.filter(RUT__iregex=query) | {model}.objects.filter(RUT__icontains=query)")
-            forms_code.append(f"        serializer = {model}Serializado(result, many=True)")
-            forms_code.append(f"        return JsonResponse(serializer.data, safe=False)")
-            forms_code.append("")
-
-        if "Nombre" in fields:
-            forms_code.append(f"@csrf_exempt")
-            forms_code.append(f"def Buscar{model}PorNombre(request):")
-            forms_code.append(f"    if request.method == \"GET\":")
-            forms_code.append(f"        tmpl = Template(SEARCH_TEMPLATE)")
-            forms_code.append("        html = tmpl.render(Context({}))")
-            forms_code.append(f"        return HttpResponse(html)")
-            forms_code.append(f"    elif request.method == \"POST\":")
-            forms_code.append(f"        query = request.POST.get(\"q\", "")")
-            forms_code.append(f"        if not query:")
-            forms_code.append("            return JsonResponse({\"error\": \"Debe ingresar un término de búsqueda\"}, status=400)")
-            forms_code.append(f"        result = {model}.objects.filter(Nombre__iregex=query) | {model}.objects.filter(Nombre__icontains=query)")
-            forms_code.append(f"        serializer = {model}Serializado(result, many=True)")
-            forms_code.append(f"        return JsonResponse(serializer.data, safe=False)")
-            forms_code.append("")
-
-        elif "Titulo" in fields:
-            forms_code.append(f"@csrf_exempt")
-            forms_code.append(f"def Buscar{model}PorTitulo(request):")
-            forms_code.append(f"    if request.method == \"GET\":")
-            forms_code.append(f"        tmpl = Template(SEARCH_TEMPLATE)")
-            forms_code.append("        html = tmpl.render(Context({}))")
-            forms_code.append(f"        return HttpResponse(html)")
-            forms_code.append(f"    elif request.method == \"POST\":")
-            forms_code.append(f"        query = request.POST.get(\"q\", "")")
-            forms_code.append(f"        if not query:")
-            forms_code.append("            return JsonResponse({\"error\": \"Debe ingresar un término de búsqueda\"}, status=400)")
-            forms_code.append(f"        result = {model}.objects.filter(Titulo__iregex=query) | {model}.objects.filter(Titulo__icontains=query)")
+            filterby = []
+            if "RUT" in fields:
+                filterby.append(f"{model}.objects.filter(RUT__iregex=query) | {model}.objects.filter(RUT__icontains=query)")
+            if "Nombre" in fields:
+                filterby.append(f"{model}.objects.filter(Nombre__iregex=query) | {model}.objects.filter(Nombre__icontains=query)")
+            if "Titulo" in fields:
+                filterby.append(f"{model}.objects.filter(Titulo__iregex=query) | {model}.objects.filter(Titulo__icontains=query)")
+            filterby = " | ".join(filterby)
+            forms_code.append(f"        result = {filterby}")
             forms_code.append(f"        serializer = {model}Serializado(result, many=True)")
             forms_code.append(f"        return JsonResponse(serializer.data, safe=False)")
             forms_code.append("")
@@ -336,7 +270,55 @@ def generate_search(models):
     with open(SEARCH_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
 
+# Genera los endpoint para las APIs
+def generate_urls(models):
+    lines = [
+        "from django.contrib import admin",
+        "from django.urls import path",
+        "from . import views",
+        "from . import forms",
+        "from . import search",
+        "",
+        "urlpatterns = [",
+        "    path('admin/', admin.site.urls),",
+    ]
+    for model, _ in models:
+        # Determina si un modelo es femenino o masculino en plural
+        modelplural = str(model)
+        todes = ""
+        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
+            todes = "TodasLas"
+        else:
+            todes = "TodosLos"
+        if modelplural[-1] in VOCALES:
+            modelplural += "s"
+        else:
+            modelplural += "es"
+        
+        lines.append(f"    path('ver{todes.lower()}{modelplural.lower()}/', views.Ver{todes}{modelplural}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('crear{model.lower()}/', views.Crear{model}),")
+    
+    for model, _ in models:
+        lines.append(f"    path('borrar{model.lower()}/<int:pk>/', views.Borrar{model}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('cambiar{model.lower()}/<int:pk>/', views.Cambiar{model}),")
+        
+    for model, _ in models:
+        lines.append(f"    path('formulario{model.lower()}/', forms.VerFormulario{model}),")
+    
+    for model, fields in models:
+        if "RUT" in fields or "Nombre" in fields or "Titulo" in fields:
+            lines.append(f"    path('buscar{model.lower()}/', search.Buscar{model}),")
+    
+    lines.append("]")
+    return "\n".join(lines)
 
+# Funcion que toma como entrada el archivo models.py y genera las diferentes APIs y vistas
+# cosa que asi el frontend pueda hacer los flujos que desee sin tener que meterse al backend
+# las APIs tienen nombres largos y descriptivos para mayor conveniencia
 def main():
     models = parse_models(MODELS_FILE)
 
