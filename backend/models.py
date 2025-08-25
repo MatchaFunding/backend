@@ -27,7 +27,8 @@ class Beneficiario(models.Model):
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
 		"AI": "Aysén",
-		"MA": "Magallanes"
+		"MA": "Magallanes",
+		"NA": "Nacional"
 	}
 	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
 	PERSONA = {
@@ -82,7 +83,8 @@ class Proyecto(models.Model):
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
 		"AI": "Aysén",
-		"MA": "Magallanes"
+		"MA": "Magallanes",
+		"NA": "Nacional"
 	}
 	ID = models.BigAutoField(primary_key=True)
 	Beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE)
@@ -174,7 +176,8 @@ class Financiador(models.Model):
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
 		"AI": "Aysén",
-		"MA": "Magallanes"
+		"MA": "Magallanes",
+		"NA": "Nacional"
 	}
 	# https://www.sii.cl/mipyme/emprendedor/documentos/fac_Datos_Comenzar_2.htm
 	PERSONA = {
@@ -235,7 +238,8 @@ class Instrumento(models.Model):
 		"LR": "Los Ríos",
 		"LL": "Los Lagos",
 		"AI": "Aysén",
-		"MA": "Magallanes"
+		"MA": "Magallanes",
+		"NA": "Nacional"
 	}
 	# https://corfo.cl/sites/cpp/programasyconvocatorias/
 	ESTADO = {
