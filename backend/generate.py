@@ -9,6 +9,8 @@ ADMIN_FILE = "admin.py"
 SEARCH_FILE = "search.py"
 FORMS_FILE = "forms.py"
 TEMP_DIR = "templates"
+TS_DIR = "models"
+API_DIR = "apicalls"
 
 VOCALES = {
     'a', 'e', 'i', 'o', 'u',
@@ -27,7 +29,7 @@ SEARCH_HTML = """<form method="post">
 <input type="submit" value="Submit">
 </form>"""
 
-# Parsea models.py y devuelve una lista de clases modelo con sus campos, 
+# Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
 # omitiendo diccionarios definidos dentro de la clase
 def parse_models(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
@@ -38,31 +40,9 @@ def parse_models(file_path):
         if isinstance(node, ast.ClassDef):
             for base in node.bases:
                 if isinstance(base, ast.Attribute) and base.attr == "Model":
-                    fields = []
-                    for stmt in node.body:
-                        if isinstance(stmt, ast.Assign):  
-                            target = stmt.targets[0]
-                            if isinstance(stmt.value, ast.Dict):
-                                continue
-                            if isinstance(target, ast.Name):
-                                fields.append(target.id)
-                    models.append((node.name, fields))
-    return models
-
-# Parsea models.py y devuelve una lista de clases modelo con sus campos y valores, 
-# omitiendo diccionarios definidos dentro de la clase
-def parse_models_with_value(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        tree = ast.parse(f.read(), filename=file_path)
-
-    models = []
-    for node in tree.body:
-        if isinstance(node, ast.ClassDef):
-            for base in node.bases:
-                if isinstance(base, ast.Attribute) and base.attr == "Model":
                     fields = {}
                     for stmt in node.body:
-                        if isinstance(stmt, ast.Assign):  
+                        if isinstance(stmt, ast.Assign):
                             target = stmt.targets[0]
                             if isinstance(stmt.value, ast.Dict):
                                 continue
@@ -83,11 +63,23 @@ def generate_serializers(models):
         "",
     ]
     for model, fields in models:
+        tuplefields = tuple(fields)
         lines.append(f"class {model}Serializado(serializers.ModelSerializer):")
         lines.append(f"    class Meta:")
         lines.append(f"        model = {model}")
-        lines.append(f"        fields = {tuple(fields)}")
+        lines.append(f"        fields = {tuplefields}")
         lines.append(f"")
+        foreignkeys = {}
+        for field in fields:
+            value = str(fields[field])
+            if "ForeignKey" in value:
+                foreignkeys[field] = value
+        if foreignkeys != {}:
+            lines.append(f"class {model}ForaneoSerial(serializers.ModelSerializer):")
+            for key in foreignkeys:
+                value = foreignkeys[key]
+                lines.append(f"    {key} = {value}")
+            lines.append(f"")
     return "\n".join(lines)
 
 # Genera las vistas para leer, crear y modificar objetos del modelo
@@ -190,7 +182,7 @@ def generate_forms(models):
         forms_code.append(f"        fields = {formfields}")
         forms_code.append("")
         forms_code.append(f"def VerFormulario{model}(request):")
-        forms_code.append("    context = {}")
+        forms_code.append(f"    context = {{}}")
         forms_code.append(f"    if request.method == 'POST':")
         forms_code.append(f"        form = {model}Form(request.POST)")
         forms_code.append(f"        if form.is_valid():")
@@ -270,6 +262,168 @@ def generate_search(models):
     with open(SEARCH_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(forms_code))
 
+# Genera los modelos en typescript para cargar los datos desde el frontend
+def generate_ts(models):
+    for model, fields in models:
+        ts = []
+        ts.append(f"class {model} {{")
+        for field in fields:
+            value = str(fields[field])
+            if "BigAuto" in value or "Integer" in value or "Foreign" in value:
+                ts.append(f"    {field}: number;")
+            if "Char" in value or "Date" in value or "Email" in value or "URL" in value:
+                ts.append(f"    {field}: string;")
+        ts.append(f"    constructor(json: any) {{")
+        for field in fields:
+            ts.append(f"        this.{field} = json.{field};")
+        ts.append(f"    }}")
+        ts.append(f"}}")
+        ts.append(f"export default {model};")
+        ts = "\n".join(ts)
+        with open(os.path.join("..", TS_DIR, f"{model}.tsx"), "w", encoding="utf-8") as f:
+            f.write(ts)
+
+# Genera las vistas para leer, crear y modificar objetos del modelo dentro del front end
+def generate_apis(models):
+    for model, fields in models:
+        modelplural = str(model)
+        todes = ""
+        # Determina si un modelo es femenino o masculino en plural
+        if modelplural[-1] == "a" or modelplural[-4:] == "cion":
+            todes = "TodasLas"
+        else:
+            todes = "TodosLos"
+        if modelplural[-1] in VOCALES:
+            modelplural += "s"
+        else:
+            modelplural += "es"
+        
+        lines = []
+        api_name = f"Ver{todes}{modelplural}"
+        lines.append(f"import {model} from '../models/{model}.tsx'")
+        lines.append(f"import {{ useEffect, useState }} from 'react';")
+        lines.append(f"")
+        lines.append(f"export async function {api_name}Async(): Promise<{model}[]> {{")
+        lines.append(f"  try {{")
+        lines.append(f"    const response = await fetch('http://127.0.0.1:8000/{api_name.lower()}/', {{")
+        lines.append(f"      method: 'GET',")
+        lines.append(f"      headers: {{")
+        lines.append(f"        'Content-Type': 'application/json',")
+        lines.append(f"      }},")
+        lines.append(f"    }});")
+        lines.append(f"    if (!response.ok) {{")
+        lines.append(f"      throw new Error('Error al obtener los datos');")
+        lines.append(f"    }}")
+        lines.append(f"    const data: {model}[] = await response.json();")
+        lines.append(f"    return data;")
+        lines.append(f"  }}")
+        lines.append(f"  catch (error) {{")
+        lines.append(f"    console.error('Error en {api_name}:', error);")
+        lines.append(f"    return [];")
+        lines.append(f"  }}")
+        lines.append(f"}}")
+        lines.append(f"export function {api_name}() {{")
+        lines.append(f"  const [{model}, set{model}] = useState<{model}[]>([]);")
+        lines.append(f"")
+        lines.append(f"  useEffect(() => {{")
+        lines.append(f"      {api_name}Async().then((data) => {{")
+        lines.append(f"      set{model}(data);")
+        lines.append(f"      }});")
+        lines.append(f"  }}, []);")
+        lines.append(f"  return {model};")
+        lines.append(f"}}")
+        lines.append(f"export default {api_name};")
+        with open(os.path.join("..", API_DIR, f"{api_name}.tsx"), "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+
+        lines = []
+        api_name = f"Crear{model}"
+        lines.append(f"import {model} from '../models/{model}.tsx'")
+        lines.append(f"import {{ useEffect, useState }} from 'react';")
+        lines.append(f"")
+        lines.append(f"export async function {api_name}Async(data: {model}): Promise<{model}[]> {{")
+        lines.append(f"  try {{")
+        lines.append(f"    const response = await fetch('http://127.0.0.1:8000/{api_name.lower()}/', {{")
+        lines.append(f"      method: 'POST',")
+        lines.append(f"      headers: {{")
+        lines.append(f"        'Content-Type': 'application/json',")
+        lines.append(f"        'accept': 'application/json',")
+        lines.append(f"      }},")
+        lines.append(f"      body: JSON.stringify({{")
+        for field in fields:
+            lines.append(f"        '{field}':data.{field},")
+        lines.append(f"      }}),")
+        lines.append(f"    }});")
+        lines.append(f"    if (!response.ok) {{")
+        lines.append(f"      throw new Error('Error al obtener los datos');")
+        lines.append(f"    }}")
+        lines.append(f"    const result: {model}[] = await response.json();")
+        lines.append(f"    return result;")
+        lines.append(f"  }}")
+        lines.append(f"  catch (error) {{")
+        lines.append(f"    console.error('Error en {api_name}:', error);")
+        lines.append(f"    return [];")
+        lines.append(f"  }}")
+        lines.append(f"}}")
+        lines.append(f"export function {api_name}(data: {model}) {{")
+        lines.append(f"  const [{model}, set{model}] = useState<{model}[]>([]);")
+        lines.append(f"")
+        lines.append(f"  useEffect(() => {{")
+        lines.append(f"      {api_name}Async(data).then((out) => {{")
+        lines.append(f"      set{model}(out);")
+        lines.append(f"      }});")
+        lines.append(f"  }}, []);")
+        lines.append(f"  return {model};")
+        lines.append(f"}}")
+        lines.append(f"export default {api_name};")
+        with open(os.path.join("..", API_DIR, f"{api_name}.tsx"), "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        
+        lines = []
+        api_name = f"Cambiar{model}"
+        lines.append(f"import {model} from '../models/{model}.tsx'")
+        lines.append(f"import {{ useEffect, useState }} from 'react';")
+        lines.append(f"")
+        lines.append(f"export async function {api_name}Async(id: number, data: {model}): Promise<{model}[]> {{")
+        lines.append(f"  try {{")
+        lines.append(f"    const response = await fetch(`http://127.0.0.1:8000/{api_name.lower()}/${{id}}`, {{")
+        lines.append(f"      method: 'PUT',")
+        lines.append(f"      headers: {{")
+        lines.append(f"        'Content-Type': 'application/json',")
+        lines.append(f"        'accept': 'application/json',")
+        lines.append(f"      }},")
+        lines.append(f"      body: JSON.stringify({{")
+        for field in fields:
+            lines.append(f"        '{field}':data.{field},")
+        lines.append(f"      }}),")
+        lines.append(f"    }});")
+        lines.append(f"    if (!response.ok) {{")
+        lines.append(f"      throw new Error('Error al obtener los datos');")
+        lines.append(f"    }}")
+        lines.append(f"    const result: {model}[] = await response.json();")
+        lines.append(f"    return result;")
+        lines.append(f"  }}")
+        lines.append(f"  catch (error) {{")
+        lines.append(f"    console.error('Error en {api_name}:', error);")
+        lines.append(f"    return [];")
+        lines.append(f"  }}")
+        lines.append(f"}}")
+        lines.append(f"export function {api_name}(id: number, data: {model}) {{")
+        lines.append(f"  const [{model}, set{model}] = useState<{model}[]>([]);")
+        lines.append(f"")
+        lines.append(f"  useEffect(() => {{")
+        lines.append(f"      {api_name}Async(id: number, data).then((out) => {{")
+        lines.append(f"      set{model}(out);")
+        lines.append(f"      }});")
+        lines.append(f"  }}, []);")
+        lines.append(f"  return {model};")
+        lines.append(f"}}")
+        lines.append(f"export default {api_name};")
+        with open(os.path.join("..", API_DIR, f"{api_name}.tsx"), "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+
+        #api_name = f"Borrar{model}"
+
 # Genera los endpoint para las APIs
 def generate_urls(models):
     lines = [
@@ -334,11 +488,10 @@ def main():
     with open(ADMIN_FILE, "w", encoding="utf-8") as f:
         f.write(generate_admin(models))
 
-    models = parse_models_with_value(MODELS_FILE)
     generate_forms(models)
-
-    models = parse_models_with_value(MODELS_FILE)
     generate_search(models)
+    generate_ts(models)
+    generate_apis(models)
 
     print("Archivos generados correctamente!")
 
