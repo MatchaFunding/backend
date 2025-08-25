@@ -422,7 +422,43 @@ def generate_apis(models):
         with open(os.path.join("..", API_DIR, f"{api_name}.tsx"), "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
 
-        #api_name = f"Borrar{model}"
+        lines = []
+        api_name = f"Borrar{model}"
+        lines.append(f"import {model} from '../models/{model}.tsx'")
+        lines.append(f"import {{ useEffect, useState }} from 'react';")
+        lines.append(f"")
+        lines.append(f"export async function {api_name}Async(id: number): Promise<{model}[]> {{")
+        lines.append(f"  try {{")
+        lines.append(f"    const response = await fetch(`http://127.0.0.1:8000/{api_name.lower()}/${{id}}`, {{")
+        lines.append(f"      method: 'POST',")
+        lines.append(f"      headers: {{")
+        lines.append(f"        'Content-Type': 'application/json',")
+        lines.append(f"      }},")
+        lines.append(f"    }});")
+        lines.append(f"    if (!response.ok) {{")
+        lines.append(f"      throw new Error('Error al obtener los datos');")
+        lines.append(f"    }}")
+        lines.append(f"    const data: {model}[] = await response.json();")
+        lines.append(f"    return data;")
+        lines.append(f"  }}")
+        lines.append(f"  catch (error) {{")
+        lines.append(f"    console.error('Error en {api_name}:', error);")
+        lines.append(f"    return [];")
+        lines.append(f"  }}")
+        lines.append(f"}}")
+        lines.append(f"export function {api_name}(id: number) {{")
+        lines.append(f"  const [{model}, set{model}] = useState<{model}[]>([]);")
+        lines.append(f"")
+        lines.append(f"  useEffect(() => {{")
+        lines.append(f"      {api_name}Async(id).then((data) => {{")
+        lines.append(f"      set{model}(data);")
+        lines.append(f"      }});")
+        lines.append(f"  }}, []);")
+        lines.append(f"  return {model};")
+        lines.append(f"}}")
+        lines.append(f"export default {api_name};")
+        with open(os.path.join("..", API_DIR, f"{api_name}.tsx"), "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
 
 # Genera los endpoint para las APIs
 def generate_urls(models):
